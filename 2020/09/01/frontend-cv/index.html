@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="opencv,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="导语：前端智能化，就是通过AI/CV技术，使前端工具链具备理解能力，进而辅助开发提升研发效率，比如实现基于设计稿智能布局和组件智能识别等。 本文要介绍的是前端智能化的一类实践：通过计算机视觉和机器学习实现自动提取图片中的UI样式的能力。  具体效果如上图，当用户框选图片中包含组件的区域，算法能准确定位组件位置，并有效识别组件的UI样式。 样式提取方案对图像的样式检测涉及计算机视觉领域知识，本文基于">
+<meta name="keywords" content="opencv">
+<meta property="og:type" content="article">
+<meta property="og:title" content="前端智能化实践 ——从图片识别UI样式">
+<meta property="og:url" content="https://www.yonechen.com/2020/09/01/frontend-cv/index.html">
+<meta property="og:site_name" content="Yone Chen">
+<meta property="og:description" content="导语：前端智能化，就是通过AI/CV技术，使前端工具链具备理解能力，进而辅助开发提升研发效率，比如实现基于设计稿智能布局和组件智能识别等。 本文要介绍的是前端智能化的一类实践：通过计算机视觉和机器学习实现自动提取图片中的UI样式的能力。  具体效果如上图，当用户框选图片中包含组件的区域，算法能准确定位组件位置，并有效识别组件的UI样式。 样式提取方案对图像的样式检测涉及计算机视觉领域知识，本文基于">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-4d1a24d3b9f31b02.gif?imageMogr2/auto-orient/strip">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-f9bd88cb6332777f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-e20eca4018067284.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-9e9a4221ff46b656.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-b137d63227a3ddf8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-522fb766a54fdfa0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-8a25f9283056a5e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-bd523e110ef0a7cb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-883f86b81e4e077f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-b8ed52e6d060aee2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-440976f603bdcdc4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-b05c9056e868c828.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2021-03-02T04:08:32.416Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="前端智能化实践 ——从图片识别UI样式">
+<meta name="twitter:description" content="导语：前端智能化，就是通过AI/CV技术，使前端工具链具备理解能力，进而辅助开发提升研发效率，比如实现基于设计稿智能布局和组件智能识别等。 本文要介绍的是前端智能化的一类实践：通过计算机视觉和机器学习实现自动提取图片中的UI样式的能力。  具体效果如上图，当用户框选图片中包含组件的区域，算法能准确定位组件位置，并有效识别组件的UI样式。 样式提取方案对图像的样式检测涉及计算机视觉领域知识，本文基于">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/1939855-4d1a24d3b9f31b02.gif?imageMogr2/auto-orient/strip">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.yonechen.com/2020/09/01/frontend-cv/">
+
+
+
+
+
+  <title>前端智能化实践 ——从图片识别UI样式 | Yone Chen</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yone Chen</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cases">
+          <a href="/cases/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            cases
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.yonechen.com/2020/09/01/frontend-cv/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yone Chen">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yone Chen">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">前端智能化实践 ——从图片识别UI样式</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2020-09-01T11:44:53+08:00">
+                2020-09-01
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><em>导语：前端智能化，就是通过AI/CV技术，使前端工具链具备理解能力，进而辅助开发提升研发效率，比如实现基于设计稿智能布局和组件智能识别等。</em></p>
+<p>本文要介绍的是前端智能化的一类实践：通过计算机视觉和机器学习实现自动提取图片中的UI样式的能力。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-4d1a24d3b9f31b02.gif?imageMogr2/auto-orient/strip" alt="demo实现效果"></p>
+<p>具体效果如上图，当用户框选图片中包含组件的区域，算法能准确定位组件位置，并有效识别组件的UI样式。</p>
+<h1 id="样式提取方案"><a href="#样式提取方案" class="headerlink" title="样式提取方案"></a>样式提取方案</h1><p>对图像的样式检测涉及计算机视觉领域知识，本文基于<a href="https://opencv.org/about/" target="_blank" rel="noopener">OpenCV</a>进行代码实现，主要分为三步：</p>
+<ol>
+<li>从图片检测并分离组件区域；</li>
+<li>基于组件区域进行形状检测；</li>
+<li>对符合规则形状的组件进行样式计算。</li>
+</ol>
+<h2 id="1-从图片分离组件区域"><a href="#1-从图片分离组件区域" class="headerlink" title="1. 从图片分离组件区域"></a>1. 从图片分离组件区域</h2><p>组件区域分离主要是通过图像分割算法，识别组件区域（前景）和背景区域，本文主要从用户框选操作上考虑，采用了可交互可迭代的Grab Cut算法。<br>Grab cut 算法允许用户框选作为前景输入，利用混合高斯模型GMM，找到前景和背景的最佳分割路径，具体可参考文章：<a href="https://blog.csdn.net/zouxy09/article/details/8534954" target="_blank" rel="noopener">图像分割——Grab Cut算法</a></p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-f9bd88cb6332777f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="输入框选区，GrabCut输出组件遮罩"></p>
+<p>如上图，通过调用OpenCV的<code>cv2.grabCut</code>方法时，我们将组件前景框(x, y, width, height)作为方法入参，识别出的组件像素被存储在mask遮罩。</p>
+<h3 id="代码实现"><a href="#代码实现" class="headerlink" title="代码实现"></a>代码实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">extract</span><span class="params">(img, rect)</span>:</span></span><br><span class="line">  <span class="string">"""输入框选区，输出GrabCut遮罩"""</span></span><br><span class="line">  x, y, w, h = rect</span><br><span class="line">  roi_img = img[y:y+h, x:x+h]</span><br><span class="line">  mask = np.zeros(roi_img.shape[:<span class="number">2</span>], np.uint8) <span class="comment"># 初始化遮罩层</span></span><br><span class="line">  bgdModel = np.zeros((<span class="number">1</span>, <span class="number">65</span>), np.float64)</span><br><span class="line">  fgdModel = np.zeros((<span class="number">1</span>, <span class="number">65</span>), np.float64)</span><br><span class="line">  <span class="comment"># 函数的返回值是更新的 mask, bgdModel, fgdModel</span></span><br><span class="line">  cv2.grabCut(img, mask, rect, bgdModel, fgdModel, <span class="number">4</span>, cv2.GC_INIT_WITH_RECT)</span><br><span class="line">  mask = np.where((mask == <span class="number">2</span>) | (mask == <span class="number">0</span>), <span class="number">0</span>, <span class="number">255</span>).astype(<span class="string">"uint8"</span>)</span><br><span class="line">  <span class="keyword">return</span> mask</span><br></pre></td></tr></table></figure>
+<p>通过这一步，我们从背景分离出目标遮罩，它是包含了N个组件区域的二值图。</p>
+<h3 id="2-形状检测"><a href="#2-形状检测" class="headerlink" title="2. 形状检测"></a>2. 形状检测</h3><p>接下来，我们需要通过形状检测从遮罩区筛选出多个可用样式还原的组件，比如矩形、带圆角矩形和圆形。<br>具体分为两步：1) 提取组件外轮廓 2) 霍夫检测识别轮廓形状</p>
+<h3 id="2-1-外轮廓提取"><a href="#2-1-外轮廓提取" class="headerlink" title="2.1 外轮廓提取"></a>2.1 外轮廓提取</h3><p>第一步是通过前面图割遮罩进行外轮廓提取，排除组件内部其它线条带来的影响。轮廓提取主要使用<a href="(https://blog.csdn.net/yiqiudream/article/details/76864722">Suzuki85轮廓跟踪算法</a>)，该算法基于二值图像拓补，能确定连通域的包含关系。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-e20eca4018067284.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="外轮廓提取流程"></p>
+<p>这里采用的是<a href="https://zhuanlan.zhihu.com/p/59640437" target="_blank" rel="noopener">Canny边缘检测</a>来得到图像边缘图，再通过Suzuki85算法<code>cv2.findContours</code>从图像边缘提取外轮廓。</p>
+<h3 id="代码实现-1"><a href="#代码实现-1" class="headerlink" title="代码实现"></a>代码实现</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">separate</span><span class="params">(img, th=<span class="number">5</span>)</span>:</span></span><br><span class="line">    <span class="string">"""输入组件区域遮罩，输出多个组件外轮廓列表"""</span></span><br><span class="line">    new_img = img.copy()</span><br><span class="line">    new_img = cv2.Canny(new_img, <span class="number">50</span>, <span class="number">150</span>)</span><br><span class="line">    new_img = image_morphology(new_img)</span><br><span class="line">    cnts, _ = cv2.findContours(new_img, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)</span><br><span class="line">    data = []</span><br><span class="line">    <span class="keyword">for</span> cnt <span class="keyword">in</span> cnts:</span><br><span class="line">        x, y, w, h = cv2.boundingRect(cnt)</span><br><span class="line">        <span class="keyword">if</span> (w &lt; th) | (h &lt; th):</span><br><span class="line">        <span class="string">"""剔除噪点"""</span></span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        data.append((cnt, x, y, w, h))</span><br><span class="line">    <span class="keyword">return</span> data</span><br></pre></td></tr></table></figure>
+<p>这一步我们得到了图像中所有组件的外轮廓以及具体的坐标<code>x,y</code>和宽高<code>w,h</code>。</p>
+<h3 id="2-2-组件的形状检测"><a href="#2-2-组件的形状检测" class="headerlink" title="2.2 组件的形状检测"></a>2.2 组件的形状检测</h3><p>第二步则是对每个组件外轮廓进行图形类型识别，其中除了矩形、圆形是样式可还原图形，其它都不可还原，我们的目标就是检测出这两种基本图形。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-9e9a4221ff46b656.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="检测目标：圆形&amp;矩形"></p>
+<p>这里运用<a href="[https://en.wikipedia.org/wiki/Hough_transform](https://en.wikipedia.org/wiki/Hough_transform">霍夫变换(Hough Transform)</a><br>)方法，它是一种识别几何形状的算法，主要采用投票机制从多个特征点拟合图像中线段和曲线的参数方程。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-b137d63227a3ddf8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="霍夫检测直线步骤"></p>
+<h4 id="2-2-1-矩形检测"><a href="#2-2-1-矩形检测" class="headerlink" title="2.2.1 矩形检测"></a>2.2.1 矩形检测</h4><p>检测矩形主要分两步：1）通过霍夫直线变换检测外轮廓的边；2）根据边（线段）集合判断是否符合矩形特征。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-522fb766a54fdfa0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<p>OpenCV提供线段检测方法<code>cv2.HoughLinesP</code>，输入外轮廓，输出检测到的线段，具体代码实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 检测矩形</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">detectRectangle</span><span class="params">(img, width, height)</span>:</span></span><br><span class="line">    minLineLength = <span class="number">10</span></span><br><span class="line">    maxLineGap = <span class="number">4</span></span><br><span class="line">    <span class="comment"># 霍夫直线变换输出检测到的线段数组</span></span><br><span class="line">    lines = cv2.HoughLinesP(img, <span class="number">1</span>, np.pi/<span class="number">180</span>, <span class="number">100</span>, minLineLength, maxLineGap)</span><br><span class="line">    segments = lines.reshape(lines.shape[<span class="number">0</span>], <span class="number">4</span>)</span><br><span class="line">    <span class="comment"># 将线段数组进行进一步检测，判断是否命中矩形规则</span></span><br><span class="line">    <span class="keyword">return</span> judgeRectangle(segments, width, height)</span><br></pre></td></tr></table></figure>
+<p>取到线段集合后，我们再判断是否满足矩形边的特征：</p>
+<ol>
+<li>存在两条水平方向线段和两条垂直方向线段</li>
+<li>上线段到下线段距离≈组件高度，左线段到右线段距离≈组件宽度</li>
+</ol>
+<h4 id="代码实现-2"><a href="#代码实现-2" class="headerlink" title="代码实现"></a>代码实现</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""判断是否为矩形"""</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">judgeRectangle</span><span class="params">(lines, width, height, x=<span class="number">0</span>, y=<span class="number">0</span>)</span>:</span></span><br><span class="line">    th = <span class="number">2</span></span><br><span class="line">    horizontal_segments = lines[np.where(abs(lines[:, <span class="number">1</span>] - lines[:, <span class="number">3</span>]) &lt; th)]</span><br><span class="line">    vertical_segments = lines[np.where(abs(lines[:, <span class="number">0</span>] - lines[:, <span class="number">2</span>]) &lt; th)]</span><br><span class="line">    isRect = <span class="literal">False</span></span><br><span class="line">    h = w = <span class="literal">None</span></span><br><span class="line">    <span class="keyword">if</span> horizontal_segments.size != <span class="number">0</span>:</span><br><span class="line">        horizontal_centers = (</span><br><span class="line">            horizontal_segments[:, <span class="number">1</span>] / <span class="number">2</span> + horizontal_segments[:, <span class="number">3</span>] / <span class="number">2</span></span><br><span class="line">        )</span><br><span class="line">        top = horizontal_centers.min()</span><br><span class="line">        bottom = horizontal_centers.max()</span><br><span class="line">        h = bottom - top</span><br><span class="line">        <span class="keyword">if</span> abs(h - height) &gt; th:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span>, <span class="literal">None</span>, <span class="literal">None</span>  <span class="comment"># 如果两线间隔非图形高度，则不规则图片</span></span><br><span class="line">        isRect = <span class="literal">True</span></span><br><span class="line">        h = int(round(h))</span><br><span class="line">    <span class="keyword">if</span> vertical_segments.size != <span class="number">0</span>:</span><br><span class="line">        vertical_centers = vertical_segments[:, <span class="number">0</span>] / <span class="number">2</span> + vertical_segments[:, <span class="number">2</span>] / <span class="number">2</span></span><br><span class="line">        left = vertical_centers.min()</span><br><span class="line">        right = vertical_centers.max()</span><br><span class="line">        w = right - left</span><br><span class="line">        <span class="keyword">if</span> abs(w - width) &gt; th:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">False</span>, <span class="literal">None</span>, <span class="literal">None</span></span><br><span class="line">        isRect = <span class="literal">True</span></span><br><span class="line">        w = int(round(w))</span><br><span class="line">    <span class="keyword">return</span> isRect, w, h</span><br></pre></td></tr></table></figure>
+<h4 id="2-2-2-圆形检测"><a href="#2-2-2-圆形检测" class="headerlink" title="2.2.2 圆形检测"></a>2.2.2 圆形检测</h4><p>圆形检测可使用霍夫圆环检测法，对应OpenCV的<code>HoughCircles</code>方法，输入二值图，如果存在圆形，则返回圆形和半径。代码实现如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 检测圆形</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">detectCircle</span><span class="params">(img, width, height)</span>:</span></span><br><span class="line">    circles = cv2.HoughCircles(img,cv2.HOUGH_GRADIENT,<span class="number">1</span>,<span class="number">20</span>,param1=<span class="number">30</span>,param2=<span class="number">15</span>,minRadius=<span class="number">10</span>,maxRadius=<span class="number">0</span>)</span><br><span class="line">    <span class="keyword">if</span> circles <span class="keyword">is</span> <span class="literal">None</span>: <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">    [radius, rx, ry] = circles[<span class="number">0</span>]</span><br><span class="line">    <span class="keyword">return</span> judgeCircle(radius, rx, ry, width, height)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">judgeCircle</span><span class="params">(r, rx, ry, w, h, x=<span class="number">0</span>, y=<span class="number">0</span>, th=<span class="number">4</span>)</span>:</span></span><br><span class="line">    <span class="keyword">return</span> (</span><br><span class="line">        (abs(w - h) &lt; th)</span><br><span class="line">        &amp; (abs(r - w / <span class="number">2</span>) &lt; th)</span><br><span class="line">        &amp; (abs(rx - x - w / <span class="number">2</span>) &lt; th)</span><br><span class="line">        &amp; (abs(ry - y - h / <span class="number">2</span>) &lt; th)</span><br><span class="line">    )</span><br></pre></td></tr></table></figure>
+<p>通过这一步，我们筛选出属于矩形或圆形的组件，以及组件的宽高、圆形以及对应的半径，下一步，我们将针对这两种基本图形进行样式检测。</p>
+<h2 id="3-组件的样式计算"><a href="#3-组件的样式计算" class="headerlink" title="3. 组件的样式计算"></a>3. 组件的样式计算</h2><p>组件样式计算主要对边框、圆角、背景三种常用样式分别计算。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-8a25f9283056a5e7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="组件的样式检测"></p>
+<h3 id="3-1-圆角计算"><a href="#3-1-圆角计算" class="headerlink" title="3.1 圆角计算"></a>3.1 圆角计算</h3><p>在样式定义中，圆角被限制在矩形的四个顶点处，圆角弧度取决于它的半径，因此圆角计算的主要目标就是识别圆角的半径。<br>根据圆角的4个方位，我们将组件区域划分为4块进行逐块分析。<br>一开始，我们采用直接对圆弧点进行圆的曲线拟合，但由于圆角点的数据过于集中，拟合圆的误差很大，如图：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-bd523e110ef0a7cb.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="最小二乘法对集中数据点集拟合效果差"></p>
+<p>我们知道，圆角经过十字对称后能构造出一个圆形，因此，只要我们确定了“圆角”的候选区域，构造十字轴对称图，就可以根据圆形拟合准确判断是否为满足圆角特征了。具体步骤如下：</p>
+<ol>
+<li>假设存在圆角，用面积推算圆角半径，确定“候选区域”</li>
+<li>构造“候选区域”水平-竖直轴对称图形，对图形进行霍夫圆环检测，验证是否为圆角</li>
+</ol>
+<h4 id="3-1-1-圆角半径推算"><a href="#3-1-1-圆角半径推算" class="headerlink" title="3.1.1 圆角半径推算"></a>3.1.1 圆角半径推算</h4><p>我们假设存在圆角，半径为R，如下图黄色色块区域，是组件框与填充组件的差集。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-883f86b81e4e077f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="面积区域推算圆角半径"></p>
+<p>同时，黄色块也是以边长R为正方形与半径R为1/4圆的差集，即<code>s = R² - π × R² × ¼</code>，于是联立方程，可求解圆角半径R，代码如下：</p>
+<p>这一步我们根据面积差集计算出半径R，通过R，我们裁剪出“候选区域”，进行下一步验证。</p>
+<h4 id="3-1-2-候选区域验证"><a href="#3-1-2-候选区域验证" class="headerlink" title="3.1.2 候选区域验证"></a>3.1.2 候选区域验证</h4><p>这一步先构造轴对称图像，主要是在水平和竖直方向依次做翻转+拼接操作。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-b8ed52e6d060aee2.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="非圆角和圆角的候选区域验证对比"></p>
+<p>如图，得到对称图形后，我们沿用上文的霍夫圆环变换来检测是否存在圆形，如果存在，则圆角也存在，反之亦然。</p>
+<h4 id="代码实现-3"><a href="#代码实现-3" class="headerlink" title="代码实现"></a>代码实现</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 推算可能的圆角半径</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">getCornerRadius</span><span class="params">(img)</span>:</span></span><br><span class="line">    cornerRadius = <span class="number">0</span></span><br><span class="line">    corner_mask_size = img[img[:, :, <span class="number">3</span>] != <span class="number">1</span>].size</span><br><span class="line">    <span class="comment"># </span></span><br><span class="line">    <span class="keyword">if</span> corner_mask_size &gt;= <span class="number">0</span>:</span><br><span class="line">        cornerRadius = round(math.sqrt((corner_mask_size / <span class="number">3</span>) / (<span class="number">1</span> - np.pi / <span class="number">4</span>)))</span><br><span class="line">    <span class="keyword">return</span> cornerRadius</span><br><span class="line"></span><br><span class="line"><span class="comment"># 验证候选区域是否为圆角，以左上圆角为例</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">vertifyCorner</span><span class="params">(img, cornerRadius)</span>:</span></span><br><span class="line">    cornerArea = img[:cornerRadius, :cornerRadius] <span class="comment"># 裁剪出候选区域</span></span><br><span class="line">    binary_image = np.zeros(cornerArea.shape[<span class="number">0</span>:<span class="number">2</span>],dtype=np.uint8) <span class="comment"># 构造二值图</span></span><br><span class="line">    binary_image[cornerArea[:,:,<span class="number">3</span>] != <span class="number">0</span>] = <span class="number">255</span></span><br><span class="line">    horizontal = cv2.flip(img, <span class="number">1</span>, dst=<span class="literal">None</span>) <span class="comment"># 水平镜像</span></span><br><span class="line">    img=cv2.hconcat([img, horizontal]) <span class="comment"># 水平拼接</span></span><br><span class="line">    vertical = cv2.flip(img, <span class="number">0</span>, dst=<span class="literal">None</span>) <span class="comment"># 垂直镜像</span></span><br><span class="line">    img=cv2.vconcat([img, vertical]) <span class="comment"># 垂直拼接</span></span><br><span class="line">    img = cv2.copyMakeBorder(img, <span class="number">5</span>, <span class="number">5</span>, <span class="number">5</span>, <span class="number">5</span>, cv2.BORDER_CONSTANT, value = [<span class="number">0</span>])</span><br><span class="line">    circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT,<span class="number">1</span>,<span class="number">20</span>)</span><br><span class="line">    <span class="keyword">if</span> circles <span class="keyword">is</span> <span class="literal">None</span>: <span class="keyword">return</span> <span class="literal">False</span></span><br><span class="line">    <span class="keyword">else</span>: <span class="keyword">return</span> <span class="literal">True</span></span><br></pre></td></tr></table></figure>
+<h3 id="3-2-边框计算"><a href="#3-2-边框计算" class="headerlink" title="3.2 边框计算"></a>3.2 边框计算</h3><p>对于边框的计算，我们同样是先确定边框的描述特征：A. 边框内的颜色连续与相近；B. 外轮廓和内轮廓是形状相似的。基于这个特征，我制定了以下步骤：</p>
+<ol>
+<li>色块分离：对图像基于颜色聚类，相近色区聚类同一色块</li>
+<li>遍历不同色块，提取每个色块内外轮廓，并计算其相似度</li>
+</ol>
+<h4 id="3-2-1-色块分离"><a href="#3-2-1-色块分离" class="headerlink" title="3.2.1 色块分离"></a>3.2.1 色块分离</h4><p>边框具有颜色相近的特征，我们通过聚类算法对目标图像让颜色相近的区域归类，这里采用<code>k-means</code>算法聚类，聚类特征基于图像的<a href="https://blog.csdn.net/u010429424/article/details/76577399" target="_blank" rel="noopener">HSV色彩空间</a>。<br><img src="https://upload-images.jianshu.io/upload_images/1939855-440976f603bdcdc4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="k-means对图片进行色块分离效果"></p>
+<h5 id="代码实现-4"><a href="#代码实现-4" class="headerlink" title="代码实现"></a>代码实现</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""k-means聚类"""</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">image_kmeansSegement</span><span class="params">(img, k=<span class="number">6</span>)</span>:</span></span><br><span class="line">    <span class="comment"># 将图片从RGB空间转为HSV</span></span><br><span class="line">    img = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)</span><br><span class="line">    data = img.reshape((<span class="number">-1</span>, <span class="number">3</span>))</span><br><span class="line">    data = np.float32(data)</span><br><span class="line"></span><br><span class="line">    <span class="comment"># MAX_ITER最大迭代次数，EPS最高精度</span></span><br><span class="line">    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, <span class="number">10</span>, <span class="number">1.0</span>)</span><br><span class="line">    num_clusters = k</span><br><span class="line">    ret, label, center = cv2.kmeans(</span><br><span class="line">        data, num_clusters, <span class="literal">None</span>, criteria, num_clusters, cv2.KMEANS_RANDOM_CENTERS</span><br><span class="line">    )</span><br><span class="line"></span><br><span class="line">    center = cv2.cvtColor(np.array([center], dtype=np.uint8), cv2.COLOR_HSV2BGR)[<span class="number">0</span>]</span><br><span class="line">    labels = label.flatten()</span><br><span class="line">    <span class="keyword">return</span> labels, center</span><br></pre></td></tr></table></figure>
+<h4 id="3-2-2-候选区域验证"><a href="#3-2-2-候选区域验证" class="headerlink" title="3.2.2 候选区域验证"></a>3.2.2 候选区域验证</h4><p>这一步是遍历k个候选色块，对色块分别进行外轮廓和内轮廓提取，再判断色块内外轮廓是否形状相似。<br>其中外轮廓的提取直接复用前面的<code>cv2.findContours</code>方法，输入色块，输出外轮廓填充图。<br>内轮廓则需要分两步，首先对外轮廓填充图与色块填充图进行差运算得到“内域”，再对内域进行<code>cv2.findContours</code>。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-b05c9056e868c828.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="pHash计算外轮廓与内轮廓相似度"></p>
+<p>拿到内外轮廓后，我使用<a href="https://blog.csdn.net/mago2015/article/details/81137089" target="_blank" rel="noopener">感知哈希pHash</a> + 汉明距离进行相似度计算，它主要通过颜色低采样将图片统一缩小到32×32尺寸并输出图像签名，很好地解决相似形状中大小不一致带来的误差。</p>
+<h5 id="代码实现-5"><a href="#代码实现-5" class="headerlink" title="代码实现"></a>代码实现</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">"""验证每个色块是否存在边框特征B"""</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">borderExtract</span><span class="params">(labels, center, img_filled)</span>:</span></span><br><span class="line">    <span class="comment"># 遍历k-means分离的k个色块</span></span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> range(labels.max()):</span><br><span class="line">        area = np.zeros((labels.size), dtype=np.uint8)</span><br><span class="line">        area[labels == i] = <span class="number">255</span></span><br><span class="line">        area = area.reshape(img_filled.shape)</span><br><span class="line">        <span class="comment"># 获取当前色块外轮廓，用白色填充</span></span><br><span class="line">        outter_filled, *_ = image_contours(area)</span><br><span class="line">        <span class="comment"># 获取当前色块内轮廓，用白色填充</span></span><br><span class="line">        result = outter_filled - area</span><br><span class="line">        result[result &lt; <span class="number">0</span>] = <span class="number">0</span></span><br><span class="line">        inner_filled, *_ = image_contours(result)</span><br><span class="line">        <span class="comment"># 判断外轮廓和内轮廓是否相似</span></span><br><span class="line">        <span class="keyword">if</span> isSimilar(outter_filled, inner_filled) &amp; isSimilar(img_filled, filled1):</span><br><span class="line">            s1 = np.where(filled1 &gt; <span class="number">0</span>)[<span class="number">0</span>].size</span><br><span class="line">            s2 = np.where(filled2 &gt; <span class="number">0</span>)[<span class="number">0</span>].size</span><br><span class="line">            scale = (<span class="number">1.0</span> - math.sqrt(s2 / s1)) * <span class="number">0.5</span></span><br><span class="line">            _drawBorder(filled1 - filled2, center[i])</span><br><span class="line">            <span class="keyword">return</span> scale, center[i], filled2</span><br><span class="line">    <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line"></span><br><span class="line"><span class="string">"""使用pHash算法计算轮廓之间相似度"""</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">isSimilar</span><span class="params">(img1, img2, th=<span class="number">0.8</span>)</span>:</span></span><br><span class="line">    HASH1 = PHash.pHash(img1)</span><br><span class="line">    HASH2 = PHash.pHash(img2)</span><br><span class="line">    distance, score = PHash.hammingDist(HASH1, HASH2)</span><br><span class="line">    print(score)</span><br><span class="line">    <span class="keyword">return</span> score &gt; th</span><br></pre></td></tr></table></figure>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文通过OpenCV系列算法分别实现简单组件区域的分离和样式的检测，对于组件的区域检测，目前是通过手工框选的手段确定组件区域，如果要完全自动化实现Pixels to Code，还需要借助深度卷积网络进行组件检测与识别。</p>
+<p>最后，本人将于9月5号参与2020腾讯live开发者大会，介绍更多前端智能化内容，欢迎有兴趣童鞋前来观摩👇<br>腾讯Live开发者大会​：<a href="https://2020.tlc.ivweb.io/detail/?number=8" target="_blank" rel="noopener">https://2020.tlc.ivweb.io/detail/?number=8</a></p>
+<p>更多文章欢迎关注：<a href="https://zhuanlan.zhihu.com/webxr" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/webxr</a></p>
+<h2 id="相关资料"><a href="#相关资料" class="headerlink" title="相关资料"></a>相关资料</h2><p>最全综述 | 图像分割算法：<a href="https://zhuanlan.zhihu.com/p/70758906" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/p/70758906</a></p>
+<p>pHash图像相似度比较算法汇总：<a href="https://blog.csdn.net/mago2015/article/details/81137089" target="_blank" rel="noopener">https://blog.csdn.net/mago2015/article/details/81137089</a></p>
+<p>机器学习算法实践——K-Means算法与图像分割：<a href="https://blog.csdn.net/google19890102/article/details/52911835" target="_blank" rel="noopener">https://blog.csdn.net/google19890102/article/details/52911835</a></p>
+<p>霍夫变换：<a href="https://en.wikipedia.org/wiki/Hough_transform" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Hough_transform</a></p>
+<p>Suzuki85轮廓跟踪算法：<a href="https://blog.csdn.net/yiqiudream/article/details/76864722" target="_blank" rel="noopener">https://blog.csdn.net/yiqiudream/article/details/76864722</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/opencv/" rel="tag"># opencv</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/11/webgl-noise/" rel="next" title="WebGL进阶——走进图形噪声">
+                <i class="fa fa-chevron-left"></i> WebGL进阶——走进图形噪声
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <p class="site-author-name" itemprop="name">Yone Chen</p>
+            <p class="site-description motion-element" itemprop="description">技术空间站</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives/">
+            
+                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#样式提取方案"><span class="nav-number">1.</span> <span class="nav-text">样式提取方案</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-从图片分离组件区域"><span class="nav-number">1.1.</span> <span class="nav-text">1. 从图片分离组件区域</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现"><span class="nav-number">1.1.1.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-形状检测"><span class="nav-number">1.1.2.</span> <span class="nav-text">2. 形状检测</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-外轮廓提取"><span class="nav-number">1.1.3.</span> <span class="nav-text">2.1 外轮廓提取</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#代码实现-1"><span class="nav-number">1.1.4.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-组件的形状检测"><span class="nav-number">1.1.5.</span> <span class="nav-text">2.2 组件的形状检测</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-矩形检测"><span class="nav-number">1.1.5.1.</span> <span class="nav-text">2.2.1 矩形检测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码实现-2"><span class="nav-number">1.1.5.2.</span> <span class="nav-text">代码实现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-圆形检测"><span class="nav-number">1.1.5.3.</span> <span class="nav-text">2.2.2 圆形检测</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#3-组件的样式计算"><span class="nav-number">1.2.</span> <span class="nav-text">3. 组件的样式计算</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-圆角计算"><span class="nav-number">1.2.1.</span> <span class="nav-text">3.1 圆角计算</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-1-圆角半径推算"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">3.1.1 圆角半径推算</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-2-候选区域验证"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">3.1.2 候选区域验证</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#代码实现-3"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">代码实现</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-边框计算"><span class="nav-number">1.2.2.</span> <span class="nav-text">3.2 边框计算</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-1-色块分离"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">3.2.1 色块分离</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#代码实现-4"><span class="nav-number">1.2.2.1.1.</span> <span class="nav-text">代码实现</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-2-候选区域验证"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">3.2.2 候选区域验证</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#代码实现-5"><span class="nav-number">1.2.2.2.1.</span> <span class="nav-text">代码实现</span></a></li></ol></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">2.</span> <span class="nav-text">总结</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#相关资料"><span class="nav-number">2.1.</span> <span class="nav-text">相关资料</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yone Chen</span> |
+  <a href="https://beian.miit.gov.cn/">粤ICP备17126485号</a>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
