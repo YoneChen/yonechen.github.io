@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="webvr,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="前两期主要介绍了开发WebVR应用的基本套路，不过开发出来的场景还只是“可远观而不可亵玩”，缺乏交互性，本期将带大家走进VR交互世界，看看WebVR事件是如何开发的。 VR交互有哪些？在可交互的VR世界里，用户不再只是个观察者，而是虚拟世界中一个生命，可以与虚拟世界进行通信。这种通信应该是双向的：虚拟场景能感知你的存在（位置、方向），同时你的输入又对物体产生作用。这里借鉴一个VR游戏场景：  一">
+<meta name="keywords" content="webvr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebVR教程--交互事件">
+<meta property="og:url" content="https://www.yonechen.com/2017/12/07/webvr-learning-3/index.html">
+<meta property="og:site_name" content="Yone Chen">
+<meta property="og:description" content="前两期主要介绍了开发WebVR应用的基本套路，不过开发出来的场景还只是“可远观而不可亵玩”，缺乏交互性，本期将带大家走进VR交互世界，看看WebVR事件是如何开发的。 VR交互有哪些？在可交互的VR世界里，用户不再只是个观察者，而是虚拟世界中一个生命，可以与虚拟世界进行通信。这种通信应该是双向的：虚拟场景能感知你的存在（位置、方向），同时你的输入又对物体产生作用。这里借鉴一个VR游戏场景：  一">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-df36e676cf7ec90d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-964fbf19bc4bb6a7.gif?imageMogr2/auto-orient/strip">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-d36b0ec8181b8af9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-fdb0ef6409ebd9ef.gif?imageMogr2/auto-orient/strip">
+<meta property="og:updated_time" content="2017-12-07T09:14:50.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WebVR教程--交互事件">
+<meta name="twitter:description" content="前两期主要介绍了开发WebVR应用的基本套路，不过开发出来的场景还只是“可远观而不可亵玩”，缺乏交互性，本期将带大家走进VR交互世界，看看WebVR事件是如何开发的。 VR交互有哪些？在可交互的VR世界里，用户不再只是个观察者，而是虚拟世界中一个生命，可以与虚拟世界进行通信。这种通信应该是双向的：虚拟场景能感知你的存在（位置、方向），同时你的输入又对物体产生作用。这里借鉴一个VR游戏场景：  一">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1939855-df36e676cf7ec90d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.yonechen.com/2017/12/07/webvr-learning-3/">
+
+
+
+
+
+  <title>WebVR教程--交互事件 | Yone Chen</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yone Chen</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cases">
+          <a href="/cases/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            cases
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.yonechen.com/2017/12/07/webvr-learning-3/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yone Chen">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yone Chen">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WebVR教程--交互事件</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-07T14:26:34+08:00">
+                2017-12-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="http://upload-images.jianshu.io/upload_images/1939855-df36e676cf7ec90d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<p>前两期主要介绍了开发WebVR应用的基本套路，不过开发出来的场景还只是“可远观而不可亵玩”，缺乏交互性，本期将带大家走进VR交互世界，看看WebVR事件是如何开发的。</p>
+<h1 id="VR交互有哪些？"><a href="#VR交互有哪些？" class="headerlink" title="VR交互有哪些？"></a>VR交互有哪些？</h1><p>在可交互的VR世界里，用户不再只是个观察者，而是虚拟世界中一个生命，可以与虚拟世界进行通信。这种通信应该是双向的：虚拟场景能感知你的存在（位置、方向），同时你的输入又对物体产生作用。这里借鉴一个VR游戏场景：</p>
+<ol>
+<li>一位MM想让你给她选衣服，弹出一个菜单让你选，你用touchpad滑动选择给MM装扮，你选了一条裙子并点击手柄的按钮确认；</li>
+<li>MM问你看起来好不好看，你赶紧点头；</li>
+<li>MM很高兴，让你给她拍照，这时候你的手柄已变成了相机，对准她按下按钮就可以拍照；</li>
+<li>然而你二话不说蹲下去想欣赏MM的裙底，结果MM生气了，游戏结束！</li>
+</ol>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-964fbf19bc4bb6a7.gif?imageMogr2/auto-orient/strip" alt="VR女友——点头与摇头"></p>
+<p>上述共采用了四种交互方式，根据输入设备可分为headset头显交互和gamepad手柄交互，前者通过头显行为触发事件（如2、4），后者通过手柄行为触发事件（如1、3）。</p>
+<p>这些交互行为都需要硬件支持（比如陀螺仪和加速计提供方向追踪支持），我们需要通过JavaScript API来获取headset或者gamepad的动态数据。</p>
+<p>由于各VR产商的头显和手柄具有差异，因此对于用户交互层面的支持度也参差不齐，以下展示各主流VR平台在头显和手柄方面的在交互上的支持情况。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">VR类型</th>
+<th style="text-align:center">headset</th>
+<th style="text-align:center">gamepad</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">Cardboard</td>
+<td style="text-align:center">3-DoF</td>
+<td style="text-align:center">无</td>
+</tr>
+<tr>
+<td style="text-align:center">Daydream Smartphone VR</td>
+<td style="text-align:center">3-DoF</td>
+<td style="text-align:center">3-DoF</td>
+</tr>
+<tr>
+<td style="text-align:center">Daydream Standalone VR</td>
+<td style="text-align:center">6-DoF</td>
+<td style="text-align:center">?-DoF</td>
+</tr>
+<tr>
+<td style="text-align:center">Gear VR</td>
+<td style="text-align:center">3-DoF</td>
+<td style="text-align:center">3-DoF</td>
+</tr>
+<tr>
+<td style="text-align:center">Oculus Rift</td>
+<td style="text-align:center">6-DoF</td>
+<td style="text-align:center">6-DoF</td>
+</tr>
+<tr>
+<td style="text-align:center">HTC Vive</td>
+<td style="text-align:center">6-DoF</td>
+<td style="text-align:center">6-DoF</td>
+</tr>
+<tr>
+<td style="text-align:center">Microsoft MR</td>
+<td style="text-align:center">6-DoF</td>
+<td style="text-align:center">6-DoF</td>
+</tr>
+</tbody>
+</table>
+<p>表中的DoF(degree of freedom)就是我们常说的自由度，主要为Orientation自由度和Position自由度两种。</p>
+<ul>
+<li><p>Orientation自由度，支持方向追踪，一般由陀螺仪、加速计等传感器支持</p>
+</li>
+<li><p>Position自由度，支持位置追踪，一般分为outside-in(外向追踪)的红外追踪技术和inside-out(内向追踪)的SLAM技术支持</p>
+</li>
+</ul>
+<p>通常在VR体系里，3-DoF指的是VR硬件支持Orientation，6-DoF指的是支持Orientation + Position。</p>
+<hr>
+<h1 id="Headset交互事件"><a href="#Headset交互事件" class="headerlink" title="Headset交互事件"></a>Headset交互事件</h1><p>Headset交互根据自由度可分为3-DoF和6-DoF，显然，所有的VR头显都应支持Orientation方向的3-DoF追踪。</p>
+<ul>
+<li>3-DoF依赖于设备的陀螺仪和加速计支持，根据头部朝向来渲染场景视角，可以支持gaze注视和摇头点头的行为，一般以手机VR为主；</li>
+<li>6-DoF则指的是支持空间追踪，由于可以感知空间移动，可以支持Lean, dodge, duck的交互方式，如Oculus Rift和Htc Vive，以及Microsoft MR和Daydream Standalone等。</li>
+</ul>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-d36b0ec8181b8af9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="DoF of Headset"></p>
+<p>实现headset交互，首先是要能看得到虚拟世界，上期<a href="https://zhuanlan.zhihu.com/p/28324884" target="_blank" rel="noopener">WebVR深度剖析</a>中VR渲染是实现headset交互的第一步，我们需要使用WebVR API来获取headset数据。</p>
+<p>这里再复习一下：当用户戴着headset扭头或走动时，渲染器在每帧通过VRFrameData的视觉-投影矩阵，动态计算出每个物体的MVP复合矩阵，最后进行顶点和片元绘制。<br>令人兴奋的是，three.js已经将这个过程封装到了相机和渲染器中，帮我们实现了第一步。</p>
+<p>第二步，我们需要让三维场景感知用户（头部）的存在，举个例子，当一个球朝着玩家丢过来的时候，玩家机灵一躲，程序根据球体与玩家的位置判断玩家是否躲闪成功。<br><img src="http://upload-images.jianshu.io/upload_images/1939855-fdb0ef6409ebd9ef.gif?imageMogr2/auto-orient/strip" alt="6-DoF交互：躲闪小球"><br>这时候，我们还需要用到VRFrameData一个重要属性<code>pose</code>，通过<code>frameData.pose</code>返回一个<code>VRPose</code>对象，可获取headset的传感器信息，比如位置、方向、速度和加速度等。</p>
+<h2 id="VRPose"><a href="#VRPose" class="headerlink" title="VRPose"></a>VRPose</h2><table>
+<thead>
+<tr>
+<th style="text-align:center">属性</th>
+<th style="text-align:center">类型</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">position</td>
+<td style="text-align:center"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Float32Array" target="_blank" rel="noopener">Float32Array</a></td>
+<td style="text-align:center">返回headset的位置矩阵</td>
+</tr>
+<tr>
+<td style="text-align:center">orientation</td>
+<td style="text-align:center">Float32Array</td>
+<td style="text-align:center">返回headset的方向矩阵</td>
+</tr>
+<tr>
+<td style="text-align:center">angularAcceleration</td>
+<td style="text-align:center">Float32Array</td>
+<td style="text-align:center">返回x, y, z轴每秒的角加速度</td>
+</tr>
+<tr>
+<td style="text-align:center">angularVelocity</td>
+<td style="text-align:center">Float32Array</td>
+<td style="text-align:center">返回x, y, z轴每秒的角速度</td>
+</tr>
+<tr>
+<td style="text-align:center">linearAcceleration</td>
+<td style="text-align:center">Float32Array</td>
+<td style="text-align:center">返回x, y, z轴每秒的线性加速度</td>
+</tr>
+<tr>
+<td style="text-align:center">linearVelocity</td>
+<td style="text-align:center">Float32Array</td>
+<td style="text-align:center">返回x, y, z轴的线性速度</td>
+</tr>
+</tbody>
+</table>
+<p>通过这几个属性，我们可以让相机具备物理数据，拥有实体感知能力，而不单单只是观察者模式。</p>
+<p>比如，下面实现用户在使用HTC Vive此类6-DoF的headset时，走动超过范围弹出警告的功能：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">update() &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; vrdisplay, frameData, userModel &#125; = <span class="keyword">this</span>; </span><br><span class="line">  frameData = vrdisplay.getFrameData(frameData);</span><br><span class="line">  <span class="keyword">const</span> vrpose = frameData.pose;</span><br><span class="line">  userModel.position.fromArray(vrpose.position); <span class="comment">// 将VRPose位置矩阵赋予用户角色</span></span><br><span class="line">  <span class="keyword">const</span> &#123; x, y, z &#125; = userModel.position; <span class="comment">// 解构用户位置的x,y,z坐标</span></span><br><span class="line">  <span class="keyword">if</span> ( <span class="built_in">Math</span>.abs(x) &gt; <span class="number">20</span> || <span class="built_in">Math</span>.abs(y) &gt; <span class="number">20</span> || <span class="built_in">Math</span>.abs(z) &gt; <span class="number">20</span> ) &#123;</span><br><span class="line">    <span class="comment">// 当用户离初始点超过20×20×20的空间时，弹出警告</span></span><br><span class="line">    showWarningToast();  <span class="comment">// 展示警告框</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>同样，three.js在VR模式下会自动将VRPose的<code>position</code>和<code>orientation</code>转化成camera的Object3D属性，因此我们可以直接调用<code>camera.position</code>和<code>camera.quaternation/rotation</code>获取用户的位置和朝向，代码简化如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">update() &#123;</span><br><span class="line">  <span class="keyword">const</span> &#123; camera, userModel &#125; = <span class="keyword">this</span>;</span><br><span class="line">  userModel.position.copy(camera.position);</span><br><span class="line">  <span class="keyword">const</span> &#123; x, y, z &#125; = userModel.position; <span class="comment">// 解构用户位置坐标</span></span><br><span class="line">  <span class="keyword">if</span> ( <span class="built_in">Math</span>.abs(x) &gt; <span class="number">20</span> || <span class="built_in">Math</span>.abs(y) &gt; <span class="number">20</span> || <span class="built_in">Math</span>.abs(z) &gt; <span class="number">20</span> ) &#123;</span><br><span class="line">    showWarningToast();  <span class="comment">// 用户离初始点超过20×20×20的空间时，弹出警告框</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>基本的headset交互事件就是这样，理解了这些，我们可以实现gaze事件监听，点头摇头事件监听等。</p>
+<hr>
+<h1 id="GamePad交互事件"><a href="#GamePad交互事件" class="headerlink" title="GamePad交互事件"></a>GamePad交互事件</h1><p>除了headset，现在大部分VR还搭配gamepad，用户通过手持手柄可以与虚拟场景进行交互。</p>
+<p>对于gamepad手柄而言，也有3-DoF和6-DoF的两种类型：</p>
+<ul>
+<li><p>3-DoF如daydream controller，只支持方向追踪，于是google推荐采用laser激光笔进行交互。</p>
+</li>
+<li><p>6-DoF如Oculus touch，可以进行方向和位置追踪，因此可以很好的模拟手臂的动作。</p>
+</li>
+</ul>
+<p>相比headset传感器输入产生的交互，gamepad还多了各种输入元件，如按钮、touchpad触控板或thumbstick手摇杆等。</p>
+<p>于是，根据手柄输入硬件又可将gamepad事件分为三类：</p>
+<ul>
+<li>传感器事件：由传感器对手柄进行物理追踪，如激光笔交互；</li>
+<li>按钮事件：通过点击按钮产生的交互行为；</li>
+<li>控制单元事件：由thumbstick, touchpad输入产生，如swipe滑动来翻页等。</li>
+</ul>
+<p>那么如何访问手柄硬件数据进行gamepad的事件开发呢？答案是使用<a href="https://developer.mozilla.org/en-US/docs/Web/API/Gamepad_API/Using_the_Gamepad_API" target="_blank" rel="noopener">Gamepad API</a>，下一期将针对Gamepad API的使用方法进行介绍。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/webvr/" rel="tag"># webvr</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/16/webvr-gaze/" rel="next" title="WebVR教程--Cardboard与凝视事件">
+                <i class="fa fa-chevron-left"></i> WebVR教程--Cardboard与凝视事件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/07/webvr-learning-4/" rel="prev" title="WebVR教程--使用Gamepad API">
+                WebVR教程--使用Gamepad API <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <p class="site-author-name" itemprop="name">Yone Chen</p>
+            <p class="site-description motion-element" itemprop="description">技术空间站</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives/">
+            
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#VR交互有哪些？"><span class="nav-number">1.</span> <span class="nav-text">VR交互有哪些？</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Headset交互事件"><span class="nav-number">2.</span> <span class="nav-text">Headset交互事件</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#VRPose"><span class="nav-number">2.1.</span> <span class="nav-text">VRPose</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#GamePad交互事件"><span class="nav-number">3.</span> <span class="nav-text">GamePad交互事件</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yone Chen</span> |
+  <a link="https://beian.miit.gov.cn/">粤ICP备17126485号</a>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

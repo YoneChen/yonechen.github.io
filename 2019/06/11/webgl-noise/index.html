@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="webgl,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="导语：大自然蕴含着各式各样的纹理，小到细胞菌落分布，大到宇宙星球表面。运用图形噪声，我们可以在3d场景中模拟它们，本文就带大家一起走进万能的图形噪声。 概述图形噪声，是计算机图形学中一类随机算法，经常用来模拟自然界中的各种纹理材质，如下图的云、山脉等，都是通过噪声算法模拟出来的​。 通过不同的噪声算法，作用在物体纹理和材质细节，我们可以模拟不同类型的材质。  基础噪声算法一个基础的噪声函数的入参通">
+<meta name="keywords" content="webgl">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebGL进阶——走进图形噪声">
+<meta property="og:url" content="https://www.yonechen.com/2019/06/11/webgl-noise/index.html">
+<meta property="og:site_name" content="Yone Chen">
+<meta property="og:description" content="导语：大自然蕴含着各式各样的纹理，小到细胞菌落分布，大到宇宙星球表面。运用图形噪声，我们可以在3d场景中模拟它们，本文就带大家一起走进万能的图形噪声。 概述图形噪声，是计算机图形学中一类随机算法，经常用来模拟自然界中的各种纹理材质，如下图的云、山脉等，都是通过噪声算法模拟出来的​。 通过不同的噪声算法，作用在物体纹理和材质细节，我们可以模拟不同类型的材质。  基础噪声算法一个基础的噪声函数的入参通">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-90915729bb179b00.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-27216cd7b375fbcd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-a2256d9cb35ec9bf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-b0a07dfd5f161d8b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-bea8edc3c195461d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-1d6c5af99aebbc3d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-a5bde1d56f59fa84.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-1a460033ce0c8562.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-0d60d0c59a19b40f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-383ea2dda9f038ec.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-411adf56c6fd73a7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-02abc17ebcb582ea.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-55c2bf20b958c3b7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-831e689e7cedd7ee.gif?imageMogr2/auto-orient/strip">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-56a58ce3c8e6ab4b.gif?imageMogr2/auto-orient/strip">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-5d80c980bce83c9a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-4acea47bce1270f4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-460384e5b267f6e9.png?imageMogr2/auto-orient/stripxie%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-064bd245ace18fe3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="https://upload-images.jianshu.io/upload_images/1939855-b49e2fd416d4ae30.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2019-06-11T03:44:53.385Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WebGL进阶——走进图形噪声">
+<meta name="twitter:description" content="导语：大自然蕴含着各式各样的纹理，小到细胞菌落分布，大到宇宙星球表面。运用图形噪声，我们可以在3d场景中模拟它们，本文就带大家一起走进万能的图形噪声。 概述图形噪声，是计算机图形学中一类随机算法，经常用来模拟自然界中的各种纹理材质，如下图的云、山脉等，都是通过噪声算法模拟出来的​。 通过不同的噪声算法，作用在物体纹理和材质细节，我们可以模拟不同类型的材质。  基础噪声算法一个基础的噪声函数的入参通">
+<meta name="twitter:image" content="https://upload-images.jianshu.io/upload_images/1939855-90915729bb179b00.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.yonechen.com/2019/06/11/webgl-noise/">
+
+
+
+
+
+  <title>WebGL进阶——走进图形噪声 | Yone Chen</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yone Chen</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cases">
+          <a href="/cases/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            cases
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.yonechen.com/2019/06/11/webgl-noise/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yone Chen">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yone Chen">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WebGL进阶——走进图形噪声</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-11T11:44:53+08:00">
+                2019-06-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><em>导语：大自然蕴含着各式各样的纹理，小到细胞菌落分布，大到宇宙星球表面。运用图形噪声，我们可以在3d场景中模拟它们，本文就带大家一起走进万能的图形噪声。</em></p>
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><p>图形噪声，是计算机图形学中一类随机算法，经常用来模拟自然界中的各种纹理材质，如下图的云、山脉等，都是通过噪声算法模拟出来的​。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-90915729bb179b00.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Noise构造地形、体积云"><br>通过不同的噪声算法，作用在物体纹理和材质细节，我们可以模拟不同类型的材质。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-27216cd7b375fbcd.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="不同Noise生成的材质"></p>
+<h1 id="基础噪声算法"><a href="#基础噪声算法" class="headerlink" title="基础噪声算法"></a>基础噪声算法</h1><p>一个基础的噪声函数的入参通常是一个点坐标（这个点坐标可以是二维的、三维的，甚至N维），返回值是一个浮点数值：<code>noise(vec2(x,y))</code>。<br>我们将这个浮点值转成灰度颜色，形成噪声图，具体可以通过编写片元着色器程序来绘制。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-a2256d9cb35ec9bf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="噪声函数灰度图"></p>
+<p>上图是各类噪声函数在片元着色器中的运行效果，代码如下：<br><figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// noise fragment shader</span></span><br><span class="line"><span class="keyword">varying</span> <span class="type">vec2</span> uv;</span><br><span class="line"><span class="type">float</span> noise(<span class="type">vec2</span> p) &#123;</span><br><span class="line">  <span class="comment">// TODO</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="type">void</span> main() &#123;</span><br><span class="line">    <span class="type">float</span> n = noise(uv);  <span class="comment">// 通过噪声函数计算片元坐标对应噪声值</span></span><br><span class="line">    <span class="built_in">gl_FragColor</span> = <span class="type">vec4</span>(n, n, n, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中<code>noise(st)</code>的入参<code>st</code>是片元坐标，返回的噪声值映射在片元的颜色上。<br>目前基础噪声算法比较主流的有两类：1. 梯度噪声；2. 细胞噪声；</p>
+<h2 id="梯度噪声-Gradient-Noise"><a href="#梯度噪声-Gradient-Noise" class="headerlink" title="梯度噪声 (Gradient Noise)"></a>梯度噪声 (Gradient Noise)</h2><p>梯度噪声产生的纹理具有连续性，所以经常用来模拟山脉、云朵等具有连续性的物质，该类噪声的典型代表是Perlin Noise。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-b0a07dfd5f161d8b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Perlin Noise为Perlin提出的噪声算法"></p>
+<p>其它梯度噪声还有Simplex Noise和Wavelet Noise，它们也是由Perlin Noise演变而来。</p>
+<h3 id="算法步骤"><a href="#算法步骤" class="headerlink" title="算法步骤"></a>算法步骤</h3><p>梯度噪声是通过多个随机梯度相互影响计算得到，通过梯度向量的方向与片元的位置计算噪声值。这里以2d举例，主要分为四步：1. 网格生成；2. 网格随机梯度生成；3. 梯度贡献值计算；4. 平滑插值</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-bea8edc3c195461d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Perlin Noise随机向量代表梯度"></p>
+<p>第一步，我们将2d平面分成m×n个大小相同的网格，具体数值取决于我们需要生成的纹理密度（下面以4×4作为例子）；<br><figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#define SCALE 4. // 将平面分为 4 × 4 个正方形网格</span></span><br><span class="line"><span class="type">float</span> noise(<span class="type">vec2</span> p) &#123;</span><br><span class="line">  p *= SCALE;</span><br><span class="line">  <span class="comment">// TODO</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>第二步，梯度向量生成，这一步是根据第一步生成的网格的顶点来产生随机向量，四个顶点就有四个梯度向量；</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-1d6c5af99aebbc3d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="生成随机向量"></p>
+<p>我们需要将每个网格对应的随机向量记录下来，确保不同片元在相同网格中获取的随机向量是一致的。<br><figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 输入网格顶点位置，输出随机向量</span></span><br><span class="line"><span class="type">vec2</span> random(<span class="type">vec2</span> p)&#123;</span><br><span class="line">	<span class="keyword">return</span>  <span class="number">-1.0</span> + <span class="number">2.0</span> * <span class="built_in">fract</span>(</span><br><span class="line">		<span class="built_in">sin</span>(</span><br><span class="line">			<span class="type">vec2</span>(</span><br><span class="line">				<span class="built_in">dot</span>(p, <span class="type">vec2</span>(<span class="number">127.1</span>,<span class="number">311.7</span>)),</span><br><span class="line">				<span class="built_in">dot</span>(p, <span class="type">vec2</span>(<span class="number">269.5</span>,<span class="number">183.3</span>))</span><br><span class="line">			)</span><br><span class="line">		) * <span class="number">43758.5453</span></span><br><span class="line">	);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如上，借用三角函数sin(θ)的来生成随机值，入参是网格顶点的坐标，返回值是随机向量。</p>
+<p>第三步，梯度贡献计算，这一步是通过计算四个梯度向量对当前片元点P的影响，主要先求出点P到四个顶点的距离向量，然后和对应的梯度向量进行点积。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-a5bde1d56f59fa84.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="梯度贡献值计算"></p>
+<p>如图，网格内的片元点P的四个顶点距离向量为a1, a2, a3, a4，此时将距离向量与梯度向量g1, g2, g3, g4进行点积运算：c[i] = a[i] · g[i]；</p>
+<p>第四步，平滑插值，这一步我们对四个贡献值进行线性叠加，使用<code>smoothstep()</code>方法，平滑网格边界，最终得到当前片元的噪声值。具体代码如下：<br><figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> noise_perlin (<span class="type">vec2</span> p) &#123;</span><br><span class="line">    <span class="type">vec2</span> i = <span class="built_in">floor</span>(p); <span class="comment">// 获取当前网格索引i</span></span><br><span class="line">    <span class="type">vec2</span> f = <span class="built_in">fract</span>(p); <span class="comment">// 获取当前片元在网格内的相对位置</span></span><br><span class="line">    <span class="comment">// 计算梯度贡献值</span></span><br><span class="line">    <span class="type">float</span> a = <span class="built_in">dot</span>(random(i),f); <span class="comment">// 梯度向量与距离向量点积运算</span></span><br><span class="line">    <span class="type">float</span> b = <span class="built_in">dot</span>(random(i + <span class="type">vec2</span>(<span class="number">1.</span>, <span class="number">0.</span>)),f - <span class="type">vec2</span>(<span class="number">1.</span>, <span class="number">0.</span>));</span><br><span class="line">    <span class="type">float</span> c = <span class="built_in">dot</span>(random(i + <span class="type">vec2</span>(<span class="number">0.</span>, <span class="number">1.</span>)),f - <span class="type">vec2</span>(<span class="number">0.</span>, <span class="number">1.</span>));</span><br><span class="line">    <span class="type">float</span> d = <span class="built_in">dot</span>(random(i + <span class="type">vec2</span>(<span class="number">1.</span>, <span class="number">1.</span>)),f - <span class="type">vec2</span>(<span class="number">1.</span>, <span class="number">1.</span>));</span><br><span class="line">    <span class="comment">// 平滑插值</span></span><br><span class="line">    <span class="type">vec2</span> u = <span class="built_in">smoothstep</span>(<span class="number">0.</span>,<span class="number">1.</span>,f);</span><br><span class="line">    <span class="comment">// 叠加四个梯度贡献值</span></span><br><span class="line">    <span class="keyword">return</span> <span class="built_in">mix</span>(<span class="built_in">mix</span>(a,b,u.x),<span class="built_in">mix</span>(c,d,u.x),u.y);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="细胞噪声-Celluar-Noise"><a href="#细胞噪声-Celluar-Noise" class="headerlink" title="细胞噪声 (Celluar Noise)"></a>细胞噪声 (Celluar Noise)</h2><p><img src="https://upload-images.jianshu.io/upload_images/1939855-1a460033ce0c8562.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="细胞噪声生成水纹"></p>
+<p>Celluar Noise生成的噪声图由很多个“晶胞”组成，每个晶胞向外扩张，晶胞之间相互抑制。这类噪声可以模拟细胞形态、皮革纹理等。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-0d60d0c59a19b40f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="worley noise"></p>
+<h3 id="算法步骤-1"><a href="#算法步骤-1" class="headerlink" title="算法步骤"></a>算法步骤</h3><p>细胞噪声算法主要通过距离场的形式实现的，以单个特征点为中心的径向渐变，多个特征点共同作用而成。主要分为三步：1. 网格生成；2. 特征点生成；3. 最近特征点计算</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-383ea2dda9f038ec.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="特征点距离场"></p>
+<p>第一步，网格生成：将平面划分为m×n个网格，这一步和梯度噪声的第一步一样；<br>第二步，特征点生成：为每个网格分配一个特征点<code>v[i,j]</code>，这个特征点的位置在网格内随机。<br><figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 输入网格索引，输出网格特征点坐标</span></span><br><span class="line"><span class="type">vec2</span> random(<span class="type">vec2</span> st)&#123;</span><br><span class="line">	<span class="keyword">return</span>  <span class="built_in">fract</span>(</span><br><span class="line">		<span class="built_in">sin</span>(</span><br><span class="line">			<span class="type">vec2</span>(</span><br><span class="line">				<span class="built_in">dot</span>(st, <span class="type">vec2</span>(<span class="number">127.1</span>,<span class="number">311.7</span>)),</span><br><span class="line">				<span class="built_in">dot</span>(st, <span class="type">vec2</span>(<span class="number">269.5</span>,<span class="number">183.3</span>))</span><br><span class="line">			)</span><br><span class="line">		) * <span class="number">43758.5453</span></span><br><span class="line">	);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>第三步，针对当前像素点p，计算出距离点p最近的特征点v，将点p到点v的距离记为F1；<br><figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> noise(<span class="type">vec2</span> p) &#123;</span><br><span class="line">    <span class="type">vec2</span> i = <span class="built_in">floor</span>(p); <span class="comment">// 获取当前网格索引i</span></span><br><span class="line">    <span class="type">vec2</span> f = <span class="built_in">fract</span>(p); <span class="comment">// 获取当前片元在网格内的相对位置</span></span><br><span class="line">    <span class="type">float</span> F1 = <span class="number">1.</span>;</span><br><span class="line">    <span class="comment">// 遍历当前像素点相邻的9个网格特征点</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> j = <span class="number">-1</span>; j &lt;= <span class="number">1</span>; j++) &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> k = <span class="number">-1</span>; k &lt;= <span class="number">1</span>; k++) &#123;</span><br><span class="line">            <span class="type">vec2</span> neighbor = <span class="type">vec2</span>(<span class="type">float</span>(j), <span class="type">float</span>(k));</span><br><span class="line">            <span class="type">vec2</span> point = random(i + neighbor);</span><br><span class="line">            <span class="type">float</span> d = <span class="built_in">length</span>(point + neighbor - f);</span><br><span class="line">            F1 = <span class="built_in">min</span>(F1,d);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> F1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>求解F1，我们可以遍历所有特征点v，计算每个特征点v到点p的距离，再取出最小的距离F1；但实际上，我们只需遍历离点p最近的网格特征点即可。在2d中，则最多遍历包括自身相连的9个网格，如图：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-411adf56c6fd73a7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="求解F1：点P的最近特征点距离"></p>
+<p>最后一步，将F1映射为当前像素点的颜色值，可以是<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">不仅如此，我们还可以取特征点v到点p第二近的距离F2，通过F2 - F1，得到类似泰森多变形的纹理，如上图最右侧。</span><br><span class="line"># 噪声算法组合</span><br><span class="line">前面介绍了两种主流的基础噪声算法，我们可以通过对多个不同频率的同类噪声进行运算，产生更为自然的效果，下图是经过分形操作后的噪声纹理。</span><br><span class="line">![基础噪声 / 分形 / 湍流](https://upload-images.jianshu.io/upload_images/1939855-1e538426c9d41a39.png?imageMogr2x/auto-orient/strip%7CimageView2/2/w/1240)</span><br><span class="line"></span><br><span class="line">## 分形布朗运动（Fractal Brownian Motion）</span><br><span class="line">分形布朗运动，简称fbm，是通过将不同频率和振幅的噪声函数进行操作，最常用的方法是：将频率乘2的倍数，振幅除2的倍数，线性相加。</span><br><span class="line"></span><br><span class="line">![](https://upload-images.jianshu.io/upload_images/1939855-02389fb8748bbffe.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)</span><br><span class="line"></span><br><span class="line">- 公式：`fbm = noise(st) + 0.5 * noise(2*st) + 0.25 * noise(4*st)`</span><br><span class="line"></span><br><span class="line">```glsl</span><br><span class="line">// fragment shader片元着色器</span><br><span class="line">#define OCTAVE_NUM 5</span><br><span class="line">// 叠加5次的分形噪声</span><br><span class="line">float fbm_noise(vec2 p)</span><br><span class="line">&#123;</span><br><span class="line">    float f = 0.0;</span><br><span class="line">    p = p * 4.0;</span><br><span class="line">    float a = 1.;</span><br><span class="line">    for (int i = 0; i &lt; OCTAVE_NUM; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        f += a * noise(p);</span><br><span class="line">        p = 4.0 * p;</span><br><span class="line">        a /= 4.;</span><br><span class="line">    &#125;</span><br><span class="line">    return f;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h2 id="湍流（Turbulence）"><a href="#湍流（Turbulence）" class="headerlink" title="湍流（Turbulence）"></a>湍流（Turbulence）</h2><p>另外一种变种是在fbm中对噪声函数取绝对值，使噪声值等于0处发生突变，产生湍流纹理：</p>
+<ul>
+<li>公式：<code>fbm = |noise(st)| + 0.5 * |noise(2*st)| + 0.25 * |noise(4*st)|</code></li>
+</ul>
+<figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 湍流分形噪声</span></span><br><span class="line"><span class="type">float</span> fbm_abs_noise(<span class="type">vec2</span> p)</span><br><span class="line">&#123;</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">for</span> (<span class="type">int</span> i = <span class="number">0</span>; i &lt; OCTAVE_NUM; i++)</span><br><span class="line">    &#123;</span><br><span class="line">        f += a * <span class="built_in">abs</span>(noise(p)); <span class="comment">// 对噪声函数取绝对值</span></span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> f;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>现在结合上文提到的梯度噪声和细胞噪声分别进行fbm，可以实现以下效果：</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-02abc17ebcb582ea.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Perlin Noise与Worley Noise的2D分形"></p>
+<h2 id="翘曲域（Domain-Wrapping）"><a href="#翘曲域（Domain-Wrapping）" class="headerlink" title="翘曲域（Domain Wrapping）"></a>翘曲域（Domain Wrapping）</h2><p><img src="https://upload-images.jianshu.io/upload_images/1939855-55c2bf20b958c3b7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<p>翘曲域噪声用来模拟卷曲、螺旋状的纹理，比如烟雾、大理石等，实现公式如下：</p>
+<ul>
+<li>公式：<code>f(p) = fbm( p + fbm( p + fbm( p ) ) )</code><figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">float</span> domain_wraping( <span class="type">vec2</span> p )</span><br><span class="line">&#123;</span><br><span class="line">    <span class="type">vec2</span> q = <span class="type">vec2</span>( fbm(p), fbm(p) );</span><br><span class="line"></span><br><span class="line">    <span class="type">vec2</span> r = <span class="type">vec2</span>( fbm(p + q), fbm(p + q) );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> fbm( st + r );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<p>具体实现可参考Inigo Quiles的文章：<a href="https://www.iquilezles.org/www/articles/warp/warp.htm" target="_blank" rel="noopener">https://www.iquilezles.org/www/articles/warp/warp.htm</a></p>
+<h2 id="动态纹理"><a href="#动态纹理" class="headerlink" title="动态纹理"></a>动态纹理</h2><p>前面讲的都是基于2d平面的静态噪声，我们还可以在2d基础上加上时间t维度，形成动态的噪声。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-831e689e7cedd7ee.gif?imageMogr2/auto-orient/strip" alt="2D + Time 动态噪声"></p>
+<p>如下为实现3d noise的代码结构：<br><figure class="highlight glsl"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// noise fragment shader</span></span><br><span class="line"><span class="meta">#define SPEED 20.</span></span><br><span class="line"><span class="keyword">varying</span> <span class="type">vec2</span> uv;</span><br><span class="line"><span class="keyword">uniform</span> <span class="type">float</span> u_time;</span><br><span class="line"><span class="type">float</span> noise(<span class="type">vec3</span> p) &#123;</span><br><span class="line">  <span class="comment">// TODO</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="type">void</span> main() &#123;</span><br><span class="line">    <span class="type">float</span> n = noise(uv, u_time *  SPEED);  <span class="comment">// 传入片元坐标与时间</span></span><br><span class="line">    <span class="built_in">gl_FragColor</span> = <span class="type">vec4</span>(n, n, n, <span class="number">1.0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>利用时间，我们可以生成实现动态纹理，模拟如火焰、云朵的变换。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-56a58ce3c8e6ab4b.gif?imageMogr2/auto-orient/strip" alt="Perlin Noise制作火焰"></p>
+<h1 id="噪声贴图应用"><a href="#噪声贴图应用" class="headerlink" title="噪声贴图应用"></a>噪声贴图应用</h1><p>利用噪声算法，我们可以构造物体表面的纹理颜色和材质细节，在3d开发中，一般采用贴图方式应用在3D Object上的Material材质上。</p>
+<h2 id="Color-Mapping"><a href="#Color-Mapping" class="headerlink" title="Color Mapping"></a>Color Mapping</h2><p>彩色贴图是最常用的是方式，即直接将噪声值映射为片元颜色值，作为材质的Texture图案。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-5d80c980bce83c9a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="噪声应用于Color Mapping"></p>
+<h2 id="Height-Mapping"><a href="#Height-Mapping" class="headerlink" title="Height Mapping"></a>Height Mapping</h2><p>另一种是作为Height Mapping高度贴图，生成地形高度。高度贴图的每个像素映射到平面点的高度值，通过图形噪声生成的Height Map可模拟连绵起伏的山脉。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-4acea47bce1270f4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Fbm Perlin Noise→heightmap→山脉"></p>
+<h2 id="Normal-Mapping"><a href="#Normal-Mapping" class="headerlink" title="Normal Mapping"></a>Normal Mapping</h2><p>除了通过heightMap生成地形，还可以通过<a href="https://learnopengl-cn.github.io/05%20Advanced%20Lighting/04%20Normal%20Mapping/" target="_blank" rel="noopener">法线贴图</a>改变光照效果，实现材质表面的凹凸细节。</p>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-460384e5b267f6e9.png?imageMogr2/auto-orient/stripxie%7CimageView2/2/w/1240" alt="Worley Noise→Normalmap→地表细节"></p>
+<p>这里的噪声值被映射为法线贴图的color值。</p>
+<h1 id="噪声贴图实践"><a href="#噪声贴图实践" class="headerlink" title="噪声贴图实践"></a>噪声贴图实践</h1><p>在WebGL中使用噪声贴图通常有两种方法：</p>
+<ol>
+<li>读取一张静态noise图片的噪声值；</li>
+<li>加载noise程序，切换着色器中运行它<br>前者不必多说，适用于静态纹理材质，后者适用于动态纹理，这里主要介绍后者的实现。</li>
+</ol>
+<p><img src="https://upload-images.jianshu.io/upload_images/1939855-064bd245ace18fe3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<p>这里将通过实现如上图球体的纹理贴图效果，为了简化代码，我使用Three.js来实现。<br>demo预览：<a href="https://yonechen.github.io/webgl-noise-examples/web/index.html" target="_blank" rel="noopener">https://yonechen.github.io/webgl-noise-examples/web/index.html</a></p>
+<p>首先，按往常一样创建场景、相机、渲染器，在初始化阶段创建一个球体，我们将把噪声纹理应用在这颗球体上：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Web3d</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>() &#123; ... &#125; <span class="comment">// 创建场景、相机、渲染器</span></span><br><span class="line">    <span class="comment">// 渲染前初始化钩子</span></span><br><span class="line">    start() &#123;</span><br><span class="line">        <span class="keyword">this</span>.addLight(); <span class="comment">// 添加灯光</span></span><br><span class="line">        <span class="keyword">this</span>.addBall(); <span class="comment">// 添加一个球体</span></span><br><span class="line">    &#125;</span><br><span class="line">    addBall() &#123;</span><br><span class="line">        <span class="keyword">const</span> &#123; scene &#125; = <span class="keyword">this</span>;</span><br><span class="line">        <span class="keyword">this</span>.initNoise();</span><br><span class="line">        <span class="keyword">const</span> geometry = <span class="keyword">new</span> THREE.SphereBufferGeometry(<span class="number">50</span>, <span class="number">32</span>, <span class="number">32</span>); <span class="comment">// 创建一个半径为50的球体</span></span><br><span class="line">        <span class="comment">// 创建材质</span></span><br><span class="line">        <span class="keyword">const</span> material = <span class="keyword">new</span> THREE.MeshPhongMaterial( &#123;</span><br><span class="line">            shininess: <span class="number">5</span>,</span><br><span class="line">            map: <span class="keyword">this</span>.colorMap.texture <span class="comment">// 将噪声纹理作为球体材质的colorMap</span></span><br><span class="line">        &#125; );</span><br><span class="line">        <span class="keyword">const</span> ball = <span class="keyword">new</span> THREE.Mesh( geometry, material );</span><br><span class="line">        ball.rotation.set(<span class="number">0</span>,-<span class="built_in">Math</span>.PI,<span class="number">0</span>);</span><br><span class="line">        scene.add(ball);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 动态渲染更新钩子</span></span><br><span class="line">    update() &#123; &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>接着，编写Noise shader程序，我们把前面的梯度噪声shader搬过来稍微封装下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> ColorMapShader = &#123;</span><br><span class="line">    uniforms: &#123;</span><br><span class="line">        <span class="string">"scale"</span>: &#123; <span class="attr">value</span>: <span class="keyword">new</span> THREE.Vector2( <span class="number">1</span>, <span class="number">1</span> ) &#125;,</span><br><span class="line">        <span class="string">"offset"</span>: &#123; <span class="attr">value</span>: <span class="keyword">new</span> THREE.Vector2( <span class="number">0</span>, <span class="number">0</span> ) &#125;,</span><br><span class="line">        <span class="string">"time"</span>: &#123; <span class="attr">value</span>: <span class="number">1.0</span> &#125;,</span><br><span class="line">    &#125;,</span><br><span class="line">    vertexShader: <span class="string">`</span></span><br><span class="line"><span class="string">        varying vec2 vUv;</span></span><br><span class="line"><span class="string">        uniform vec2 scale;</span></span><br><span class="line"><span class="string">        uniform vec2 offset;</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">        void main( void ) &#123;</span></span><br><span class="line"><span class="string">            vUv = uv * scale + offset;</span></span><br><span class="line"><span class="string">            gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    `</span>,</span><br><span class="line">    fragmentShader: <span class="string">`</span></span><br><span class="line"><span class="string">        varying vec2 vUv;</span></span><br><span class="line"><span class="string">        uniform float time;</span></span><br><span class="line"><span class="string">        vec3 random_perlin( vec3 p ) &#123;</span></span><br><span class="line"><span class="string">            p = vec3(</span></span><br><span class="line"><span class="string">                    dot(p,vec3(127.1,311.7,69.5)),</span></span><br><span class="line"><span class="string">                    dot(p,vec3(269.5,183.3,132.7)), </span></span><br><span class="line"><span class="string">                    dot(p,vec3(247.3,108.5,96.5)) </span></span><br><span class="line"><span class="string">                    );</span></span><br><span class="line"><span class="string">            return -1.0 + 2.0*fract(sin(p)*43758.5453123);</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">        float noise_perlin (vec3 p) &#123;</span></span><br><span class="line"><span class="string">            vec3 i = floor(p);</span></span><br><span class="line"><span class="string">            vec3 s = fract(p);</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">            // 3D网格有8个顶点</span></span><br><span class="line"><span class="string">            float a = dot(random_perlin(i),s);</span></span><br><span class="line"><span class="string">            float b = dot(random_perlin(i + vec3(1, 0, 0)),s - vec3(1, 0, 0));</span></span><br><span class="line"><span class="string">            float c = dot(random_perlin(i + vec3(0, 1, 0)),s - vec3(0, 1, 0));</span></span><br><span class="line"><span class="string">            float d = dot(random_perlin(i + vec3(0, 0, 1)),s - vec3(0, 0, 1));</span></span><br><span class="line"><span class="string">            float e = dot(random_perlin(i + vec3(1, 1, 0)),s - vec3(1, 1, 0));</span></span><br><span class="line"><span class="string">            float f = dot(random_perlin(i + vec3(1, 0, 1)),s - vec3(1, 0, 1));</span></span><br><span class="line"><span class="string">            float g = dot(random_perlin(i + vec3(0, 1, 1)),s - vec3(0, 1, 1));</span></span><br><span class="line"><span class="string">            float h = dot(random_perlin(i + vec3(1, 1, 1)),s - vec3(1, 1, 1));</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">            // Smooth Interpolation</span></span><br><span class="line"><span class="string">            vec3 u = smoothstep(0.,1.,s);</span></span><br><span class="line"><span class="string"></span></span><br><span class="line"><span class="string">            // 根据八个顶点进行插值</span></span><br><span class="line"><span class="string">            return mix(mix(mix( a, b, u.x),</span></span><br><span class="line"><span class="string">                        mix( c, e, u.x), u.y),</span></span><br><span class="line"><span class="string">                    mix(mix( d, f, u.x),</span></span><br><span class="line"><span class="string">                        mix( g, h, u.x), u.y), u.z);</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">        float noise_turbulence(vec3 p)</span></span><br><span class="line"><span class="string">        &#123;</span></span><br><span class="line"><span class="string">            float f = 0.0;</span></span><br><span class="line"><span class="string">            float a = 1.;</span></span><br><span class="line"><span class="string">            p = 4.0 * p;</span></span><br><span class="line"><span class="string">            for (int i = 0; i &lt; 5; i++) &#123;</span></span><br><span class="line"><span class="string">                f += a * abs(noise_perlin(p));</span></span><br><span class="line"><span class="string">                p = 2.0 * p;</span></span><br><span class="line"><span class="string">                a /= 2.;</span></span><br><span class="line"><span class="string">            &#125;</span></span><br><span class="line"><span class="string">            return f;</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">        void main( void ) &#123;</span></span><br><span class="line"><span class="string">            float c1 = noise_turbulence(vec3(vUv, time/10.0));</span></span><br><span class="line"><span class="string">            vec3 color = vec3(1.5*c1, 1.5*c1*c1*c1, c1*c1*c1*c1*c1*c1);</span></span><br><span class="line"><span class="string">            gl_FragColor = vec4( color, 1.0 );</span></span><br><span class="line"><span class="string">        &#125;</span></span><br><span class="line"><span class="string">    `</span></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>OK，现在让WebGL去加载这段程序，并告诉它这段代码是要作为球体的纹理贴图的：<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">initNoise() &#123;</span><br><span class="line">    const &#123; scene, renderer &#125; = this;</span><br><span class="line">    // 创建一个噪声平面，作为运行噪声shader的载体。</span><br><span class="line">    const plane = new THREE.PlaneBufferGeometry( window.innerWidth, window.innerHeight );</span><br><span class="line">    const colorMapMaterial = new THREE.ShaderMaterial( &#123;</span><br><span class="line">        ...ColorMapShader, // 将噪声着色器代码传入ShaderMaterial</span><br><span class="line">        uniforms: &#123;</span><br><span class="line">            ...ColorMapShader.uniforms,</span><br><span class="line">            scale: &#123; value: new THREE.Vector2( 1, 1 ) &#125;</span><br><span class="line">        &#125;,</span><br><span class="line">        lights: false</span><br><span class="line">    &#125; );</span><br><span class="line">    const noise = new THREE.Mesh( plane, colorMapMaterial );</span><br><span class="line">    scene.add( noise );</span><br><span class="line">    // 创建噪声纹理的渲染对象framebuffer。</span><br><span class="line">    const colorMap = new THREE.WebGLRenderTarget( 512, 512 );</span><br><span class="line">    colorMap.texture.generateMipmaps = false;</span><br><span class="line">    colorMap.texture.wrapS = colorMap.texture.wrapT = THREE.RepeatWrapping;</span><br><span class="line">    this.noise = noise;</span><br><span class="line">    this.colorMap = colorMap;</span><br><span class="line">    this.uniformsNoise = colorMapMaterial.uniforms;</span><br><span class="line">    // 创建一个正交相机，对准噪声平面。</span><br><span class="line">    this.cameraOrtho = new THREE.OrthographicCamera( window.innerWidth / - 2, window.innerWidth / 2, window.innerHeight / 2, window.innerHeight / - 2, - 10000, 10000 );</span><br><span class="line">    this._renderNoise();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>第四步，让renderer动态运行噪声shader，更新噪声变量，可以是时间、颜色、偏移量等。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">_renderNoise() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; scene, noise, colorMap, renderer, cameraOrtho &#125; = <span class="keyword">this</span>;</span><br><span class="line">    noise.visible = <span class="literal">true</span>;</span><br><span class="line">    renderer.setRenderTarget( colorMap );</span><br><span class="line">    renderer.clear();</span><br><span class="line">    renderer.render( scene, cameraOrtho );</span><br><span class="line">    noise.visible = <span class="literal">false</span>;</span><br><span class="line">&#125;</span><br><span class="line">update(delta) &#123;</span><br><span class="line">    <span class="keyword">this</span>.uniformsNoise[ <span class="string">'time'</span> ].value += delta; <span class="comment">// 更新noise的时间，生成动态纹理</span></span><br><span class="line">    <span class="keyword">this</span>._renderNoise();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>通过同样的方法，我们可以试着用在将高度贴图上，比如用Worley Noise构造的鹅卵石地表：<a href="https://yonechen.github.io/webgl-noise-examples/web/heightmap.html" target="_blank" rel="noopener">https://yonechen.github.io/webgl-noise-examples/web/heightmap.html</a><br><img src="https://upload-images.jianshu.io/upload_images/1939855-b49e2fd416d4ae30.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Worley Noise构造地形"></p>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><ul>
+<li>本文代码地址：<a href="https://github.com/YoneChen/webgl-noise-example.git" target="_blank" rel="noopener">https://github.com/YoneChen/webgl-noise-example.git</a></li>
+<li>专栏《WebXR技术庄园》：<a href="https://zhuanlan.zhihu.com/webxr" target="_blank" rel="noopener">https://zhuanlan.zhihu.com/webxr</a><br>我是<a href="https://www.zhihu.com/people/yonechen" target="_blank" rel="noopener">Yone</a>，欢迎和我一起交流WebGL相关知识。</li>
+</ul>
+<h1 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h1><ul>
+<li>OpenGL复杂地形的Shader实现：<a href="https://blog.csdn.net/Mahabharata_/article/details/78168432" target="_blank" rel="noopener">https://blog.csdn.net/Mahabharata_/article/details/78168432</a></li>
+<li>The Book of Shader - 图形噪声：<a href="https://thebookofshaders.com/11/" target="_blank" rel="noopener">https://thebookofshaders.com/11/</a></li>
+<li>【图形学】谈谈噪声：<a href="https://blog.csdn.net/candycat1992/article/details/50346469" target="_blank" rel="noopener">https://blog.csdn.net/candycat1992/article/details/50346469</a></li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/webgl/" rel="tag"># webgl</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/11/web-3d-audio/" rel="next" title="Web Audio实现3D音效">
+                <i class="fa fa-chevron-left"></i> Web Audio实现3D音效
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <p class="site-author-name" itemprop="name">Yone Chen</p>
+            <p class="site-description motion-element" itemprop="description">技术空间站</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives/">
+            
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#基础噪声算法"><span class="nav-number">2.</span> <span class="nav-text">基础噪声算法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#梯度噪声-Gradient-Noise"><span class="nav-number">2.1.</span> <span class="nav-text">梯度噪声 (Gradient Noise)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#算法步骤"><span class="nav-number">2.1.1.</span> <span class="nav-text">算法步骤</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#细胞噪声-Celluar-Noise"><span class="nav-number">2.2.</span> <span class="nav-text">细胞噪声 (Celluar Noise)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#算法步骤-1"><span class="nav-number">2.2.1.</span> <span class="nav-text">算法步骤</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#湍流（Turbulence）"><span class="nav-number">2.3.</span> <span class="nav-text">湍流（Turbulence）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#翘曲域（Domain-Wrapping）"><span class="nav-number">2.4.</span> <span class="nav-text">翘曲域（Domain Wrapping）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#动态纹理"><span class="nav-number">2.5.</span> <span class="nav-text">动态纹理</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#噪声贴图应用"><span class="nav-number">3.</span> <span class="nav-text">噪声贴图应用</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Color-Mapping"><span class="nav-number">3.1.</span> <span class="nav-text">Color Mapping</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Height-Mapping"><span class="nav-number">3.2.</span> <span class="nav-text">Height Mapping</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Normal-Mapping"><span class="nav-number">3.3.</span> <span class="nav-text">Normal Mapping</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#噪声贴图实践"><span class="nav-number">4.</span> <span class="nav-text">噪声贴图实践</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#最后"><span class="nav-number">5.</span> <span class="nav-text">最后</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#参考资料"><span class="nav-number">6.</span> <span class="nav-text">参考资料</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yone Chen</span> |
+  <a link="https://beian.miit.gov.cn/">粤ICP备17126485号</a>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

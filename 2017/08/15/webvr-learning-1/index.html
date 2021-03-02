@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="webvr,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="最近WebVR API 1.1已经发布，2.0草案也在拟定中，在我看来，WebVR走向大众浏览器是早晚的事情了，今天本人将对WebVR开发环境和开发流程进行深入介绍。 WebVR与WebVR API首先，WebVR指的是使用浏览器体验VR的方式，如今已经成为了一种开放标准。它提供了JavaScript API，使开发者可以获取vr设备的输入信息，来改变用户在虚拟空间里的位置、视觉、行为等。以下是目">
+<meta name="keywords" content="webvr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebVR教程--深度剖析">
+<meta property="og:url" content="https://www.yonechen.com/2017/08/15/webvr-learning-1/index.html">
+<meta property="og:site_name" content="Yone Chen">
+<meta property="og:description" content="最近WebVR API 1.1已经发布，2.0草案也在拟定中，在我看来，WebVR走向大众浏览器是早晚的事情了，今天本人将对WebVR开发环境和开发流程进行深入介绍。 WebVR与WebVR API首先，WebVR指的是使用浏览器体验VR的方式，如今已经成为了一种开放标准。它提供了JavaScript API，使开发者可以获取vr设备的输入信息，来改变用户在虚拟空间里的位置、视觉、行为等。以下是目">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-cdea08effd465e7c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-5a65908a3e75f0e9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-9545a85e0244cbb8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-a95e2443a9e4d4db.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-706f3a2451fc590e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-ab50541c023521f0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-4a049efe0a5fee31.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-14b3af95c959b3d3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-2deb638717d350a5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-12-07T10:02:52.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WebVR教程--深度剖析">
+<meta name="twitter:description" content="最近WebVR API 1.1已经发布，2.0草案也在拟定中，在我看来，WebVR走向大众浏览器是早晚的事情了，今天本人将对WebVR开发环境和开发流程进行深入介绍。 WebVR与WebVR API首先，WebVR指的是使用浏览器体验VR的方式，如今已经成为了一种开放标准。它提供了JavaScript API，使开发者可以获取vr设备的输入信息，来改变用户在虚拟空间里的位置、视觉、行为等。以下是目">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1939855-cdea08effd465e7c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.yonechen.com/2017/08/15/webvr-learning-1/">
+
+
+
+
+
+  <title>WebVR教程--深度剖析 | Yone Chen</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yone Chen</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cases">
+          <a href="/cases/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            cases
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.yonechen.com/2017/08/15/webvr-learning-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yone Chen">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yone Chen">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WebVR教程--深度剖析</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-08-15T18:43:58+08:00">
+                2017-08-15
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近WebVR API 1.1已经发布，2.0草案也在拟定中，在我看来，WebVR走向大众浏览器是早晚的事情了，今天本人将对WebVR开发环境和开发流程进行深入介绍。</p>
+<h1 id="WebVR与WebVR-API"><a href="#WebVR与WebVR-API" class="headerlink" title="WebVR与WebVR API"></a>WebVR与WebVR API</h1><p>首先，WebVR指的是使用浏览器体验VR的方式，如今已经成为了一种开放标准。<br>它提供了JavaScript API，使开发者可以获取vr设备的输入信息，来改变用户在虚拟空间里的位置、视觉、行为等。<br>以下是目前主流VR及浏览器对WebVR的支持情况。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">VR平台</th>
+<th style="text-align:left">浏览器支持</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Cardboard</td>
+<td style="text-align:left">chrome、百度VR浏览器</td>
+</tr>
+<tr>
+<td style="text-align:left">Daydream</td>
+<td style="text-align:left">chrome</td>
+</tr>
+<tr>
+<td style="text-align:left">Gear VR</td>
+<td style="text-align:left">Oculus Browser 或 Samsung Internet</td>
+</tr>
+<tr>
+<td style="text-align:left">Oculus Rift</td>
+<td style="text-align:left">Firefox 或 Chromium experimental分支</td>
+</tr>
+<tr>
+<td style="text-align:left">HTC Vive</td>
+<td style="text-align:left">Firefox 或 Chromium experimental分支 或 Servo</td>
+</tr>
+</tbody>
+</table>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-cdea08effd465e7c.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="daydream view"><br>遗憾的是，WebVR的体验方式目前只能运行在Android和Windows系统上。不过这并不影响我们在mac和linux上开发与调试。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-5a65908a3e75f0e9.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Gear VR 5"></p>
+<h1 id="WebVR的开发环境配置"><a href="#WebVR的开发环境配置" class="headerlink" title="WebVR的开发环境配置"></a>WebVR的开发环境配置</h1><p>由于WebVR App需要运行VR设备上，而目前购买一台VR设备的成本不低，所以这里我总结了一套开发环境下WebVR调试方案。<br>首先我们需要给WebVR静态页面起一个web server，这里我安装 <a href="https://chrome.google.com/webstore/detail/web-server-for-chrome/ofhbbkphhbklhfoeikjpcbhemlocgigb" target="_blank" rel="noopener">Web Server for Chrome</a>，你也可以使用node或者上传至github托管。</p>
+<h2 id="PC端调试"><a href="#PC端调试" class="headerlink" title="PC端调试"></a>PC端调试</h2><h4 id="1-安装chrome扩展程序-WebVR-API-Emulation"><a href="#1-安装chrome扩展程序-WebVR-API-Emulation" class="headerlink" title="1. 安装chrome扩展程序 WebVR API Emulation"></a>1. 安装chrome扩展程序 <a href="https://chrome.google.com/webstore/detail/webvr-api-emulation/gbdnpaebafagioggnhkacnaaahpiefil" target="_blank" rel="noopener">WebVR API Emulation</a></h4><p>使用WebVR API Emulation扩展程序可以模拟VR设备用户的视角、位置等。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-9545a85e0244cbb8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="WebVR API Emulation模拟VR体验"></p>
+<h2 id="移动端调试"><a href="#移动端调试" class="headerlink" title="移动端调试"></a>移动端调试</h2><p>适用于cardboard级别的WebVR App调试。</p>
+<h3 id="1-安装chrome-beta"><a href="#1-安装chrome-beta" class="headerlink" title="1. 安装chrome beta"></a>1. 安装<a href="https://play.google.com/store/apps/details?id=com.chrome.beta&amp;hl=zh" target="_blank" rel="noopener">chrome beta</a></h3><p>目前需要webvr还属于早期实验阶段，需要下载chrome beta最新版，安装完需要手动开启webvr支持，在浏览器地址栏输入<code>chrome://flags#enable-webvr</code>，点击启用并重新启动chrome。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-a95e2443a9e4d4db.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<h3 id="2-安装Google-VR-服务"><a href="#2-安装Google-VR-服务" class="headerlink" title="2. 安装Google VR 服务"></a>2. 安装<a href="https://play.google.com/store/apps/details?id=com.google.vr.vrcore&amp;hl=zh" target="_blank" rel="noopener">Google VR 服务</a></h3><p>这是google给cardboard、daydream用户提供VR服务配置，可以提供VR模式窗口，如下图。<br>最后你可以在chrome上打开<a href="https://vrlist.io" target="_blank" rel="noopener">WebVR示例页面</a>验证是否配置成功</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-706f3a2451fc590e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="WebVR示例应用"></p>
+<h3 id="3-chrome-inspector调试"><a href="#3-chrome-inspector调试" class="headerlink" title="3. chrome inspector调试"></a>3. chrome inspector调试</h3><p>通过手机chrome访问我们开发的WebVR页面，在PC端chrome输入<code>chrome://inspector</code>进行调试，具体可以参考 <a href="https://developers.google.com/web/tools/chrome-devtools/remote-debugging/?hl=zh-cn" target="_blank" rel="noopener">远程调试 Android 设备使用入门</a>。</p>
+<p>完成WebVR开发环境配置之后，我们将正式进入WebVR开发之旅。</p>
+<hr>
+<h1 id="使用WebGL开发WebVR"><a href="#使用WebGL开发WebVR" class="headerlink" title="使用WebGL开发WebVR"></a>使用WebGL开发WebVR</h1><p>WebVR App实现依赖于WebGL技术开发，WebGL是在浏览器上创建和运行3D图像，它遵循OpenGL ES的规范，通过GLSL语言操作GPU进行顶点片元渲染。<br><img src="http://upload-images.jianshu.io/upload_images/1939855-ab50541c023521f0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="3维模型矩阵变换"><br>在WebGL场景中，3d物体都是通过矩阵变换最终形成屏幕上的2d图像，[投影矩阵<code>ProjectionMatrix</code>] × [视图矩阵<code>ViewMatrix</code>] × [模型矩阵<code>ModelMatrix</code>] × 顶点坐标，其中投影矩阵和视图矩阵可以抽象为3d场景中的相机属性。</p>
+<blockquote>
+<p>模型矩阵 × 顶点坐标（相对模型） = 顶点世界坐标（绝对坐标）<br>视图矩阵 × 世界坐标 = 顶点相机坐标（以相机为坐标原点）<br>投影矩阵 × 顶点相机坐标 = 2d屏幕坐标</p>
+</blockquote>
+<p>相比一般WebGL场景，WebVR App不同之处在于：</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-4a049efe0a5fee31.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="左侧视图和右侧视图的相对变形，模拟左右眼的视觉差异，来产生3d效果"></p>
+<ul>
+<li><p>WebVR需要进行双屏渲染，通过分屏模拟人左右眼视野，因此在每一帧动画渲染中，WebVR应用都要比普通WebGL应用多绘制一次；</p>
+</li>
+<li><p>WebVR场景相机的方向、视野、位置（DOF）与用户头显(HMD)紧密关联。</p>
+</li>
+</ul>
+<p>换句话说，当用户的现实视角发生变化时，WebVR场景的相机也需要动态变化。</p>
+<p>根据以上不同之处，我梳理了一个WebVR App的简单开发流程，如下图。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-14b3af95c959b3d3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="WebVR开发流程"><br>开发流程总结为： VR数据初始化 → WebGL初始化 → 动画渲染。</p>
+<h2 id="一、VR数据初始化"><a href="#一、VR数据初始化" class="headerlink" title="一、VR数据初始化"></a>一、VR数据初始化</h2><p>使用<code>navigator.getVRDisplay()</code>方法获取VR实例，该方法返回值是一个promise实例，通过<code>.then(function(displays){})</code>取得当前使用的VR实例列表。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">let</span> vrDisplay;</span><br><span class="line">navigator.getVRDisplays().then(<span class="function"><span class="params">displays</span> =&gt;</span> &#123;</span><br><span class="line">  <span class="keyword">if</span> (displays.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    vrDisplay = displays[<span class="number">0</span>];</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'Display found'</span>,vrDisplay);</span><br><span class="line">    drawVRScene();</span><br><span class="line">  &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'Display not found'</span>);</span><br><span class="line">    <span class="comment">// 非VR模式下渲染</span></span><br><span class="line">    <span class="comment">// drawScene();</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h2 id="二、WebGL初始化"><a href="#二、WebGL初始化" class="headerlink" title="二、WebGL初始化"></a>二、WebGL初始化</h2><p>WebGL程序初始化一般分为这几个步骤：编译顶点、片元着色器程序→创建顶点、纹理缓冲区→ 设置画布被清空时颜色→启动深度测试</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">drawVRScene</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> canvas = <span class="built_in">document</span>.getElementById(<span class="string">'glcanvas'</span>);</span><br><span class="line">  <span class="comment">// 获取WebGL上下文</span></span><br><span class="line">  <span class="keyword">const</span> gl = canvas.getContext(<span class="string">'webgl'</span>);</span><br><span class="line">  <span class="comment">// WebGL初始化</span></span><br><span class="line">  init(gl);</span><br><span class="line">  <span class="comment">// WebGL渲染</span></span><br><span class="line">  render(gl);</span><br><span class="line">&#125;</span><br><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">init</span>(<span class="params">gl</span>) </span>&#123;</span><br><span class="line">  <span class="comment">// 预编译着色器程序</span></span><br><span class="line">  <span class="keyword">if</span> (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) &#123;</span><br><span class="line">    <span class="built_in">console</span>.log(<span class="string">'Failed to intialize shaders.'</span>);</span><br><span class="line">    <span class="keyword">return</span>;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// 创建顶点缓冲</span></span><br><span class="line">  initVertexBuffers(gl);</span><br><span class="line">  <span class="comment">// 创建纹理缓冲</span></span><br><span class="line">  initTextures(gl,<span class="string">'../assets/texture.jpg'</span>);</span><br><span class="line">  gl.clearColor(<span class="number">0.4</span>, <span class="number">0.4</span>, <span class="number">0.4</span>, <span class="number">1.0</span>);</span><br><span class="line">  <span class="comment">// 启动深度测试</span></span><br><span class="line">  gl.enable(gl.DEPTH_TEST);</span><br><span class="line">  gl.depthFunc(gl.LEQUAL);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="GLSL着色器程序"><a href="#GLSL着色器程序" class="headerlink" title="GLSL着色器程序"></a>GLSL着色器程序</h3><p>顶点着色器要做的工作是将Js输入的顶点坐标、模型-视图-投影矩阵进行逐顶点运算。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> VSHADER_SOURCE = <span class="string">`</span></span><br><span class="line"><span class="string">attribute vec4 a_Position;</span></span><br><span class="line"><span class="string">uniform mat4 u_MvpMatrix;</span></span><br><span class="line"><span class="string">attribute vec2 a_TexCoord;</span></span><br><span class="line"><span class="string">varying highp vec2 v_TexCoord;</span></span><br><span class="line"><span class="string">void main() &#123;</span></span><br><span class="line"><span class="string">    gl_Position = u_MvpMatrix * a_Position;</span></span><br><span class="line"><span class="string">    v_TexCoord = a_TexCoord;</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">`</span>;</span><br></pre></td></tr></table></figure>
+<p>片元着色器主要处理片元颜色，在这里只是将纹理坐标和纹理对象传给片元着色器。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> FSHADER_SOURCE = <span class="string">`</span></span><br><span class="line"><span class="string">uniform sampler2D u_Sampler;</span></span><br><span class="line"><span class="string">varying highp vec2 v_TexCoord;</span></span><br><span class="line"><span class="string">void main() &#123;</span></span><br><span class="line"><span class="string">    gl_FragColor = texture2D(u_Sampler,v_TexCoord);</span></span><br><span class="line"><span class="string">&#125;</span></span><br><span class="line"><span class="string">`</span>;</span><br></pre></td></tr></table></figure>
+<p>WebVR前期初始化之后，我们需要创建动画来渲染VR场景。</p>
+<h2 id="三、动画渲染"><a href="#三、动画渲染" class="headerlink" title="三、动画渲染"></a>三、动画渲染</h2><h3 id="1-requestAnimationFrame创建动画"><a href="#1-requestAnimationFrame创建动画" class="headerlink" title="1. requestAnimationFrame创建动画"></a>1. requestAnimationFrame创建动画</h3><p>通过使用vrDisplay实例的<code>requestAnimationFrame(callback)</code>，递归执行callback函数。<br>该方法是<code>window.requestAnimationFrame</code>的一个特殊实现，它会优先使用VR设备原生的刷新率而不是浏览器的刷新率，以达到合适的渲染帧频。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">render</span>(<span class="params">gl,vrDisplay</span>) </span>&#123;</span><br><span class="line">    <span class="comment">// 创建VR帧数据对象</span></span><br><span class="line">    <span class="keyword">const</span> frameData = <span class="keyword">new</span> VRFrameData();</span><br><span class="line">    <span class="keyword">const</span> u_MvpMatrix = gl.getUniformLocation(gl.program, <span class="string">'u_MvpMatrix'</span>);</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">animate</span>(<span class="params"></span>) </span>&#123;</span><br><span class="line">      <span class="comment">// TODO</span></span><br><span class="line">      draw(frameData,u_MvpMatrix);</span><br><span class="line">      <span class="comment">// 通过递归的方式，执行绘图函数，产生动画</span></span><br><span class="line">      vrDisplay.requestAnimationFrame(animate);</span><br><span class="line">    &#125;</span><br><span class="line">    animate();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们在启动动画递归之前使用<code>new VRFrameData()</code>方法，<code>VRFrameData</code>是WebVR提供的帧数据封装对象，是WebVR渲染的关键数据，下文将会介绍如何使用它。</p>
+<h3 id="2-VR渲染"><a href="#2-VR渲染" class="headerlink" title="2. VR渲染"></a>2. VR渲染</h3><h4 id="2-1-使用viewport设置双视口"><a href="#2-1-使用viewport设置双视口" class="headerlink" title="2.1 使用viewport设置双视口"></a>2.1 使用<a href="https://developer.mozilla.org/zh-CN/docs/Web/API/WebGLRenderingContext/viewport" target="_blank" rel="noopener">viewport</a>设置双视口</h4><p>WebGL上下文提供了<code>viewport</code>函数，用来指定3d场景在canvas的绘制位置和尺寸。<br>默认的情况下，WebGL渲染视口为<code>gl.viewport(0, 0, canvas.width, canvas.height)</code>。<br>其中前两个参数代表渲染的起点坐标，后两个参数代表渲染的尺寸，这里通过依次设置左右眼渲染视口，来达到分屏效果。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">draw</span>(<span class="params">frameData,u_MvpMatrix</span>) </span>&#123;</span><br><span class="line">  gl.viewport(<span class="number">0</span>, <span class="number">0</span>, canvas.width * <span class="number">0.5</span>, canvas.height); <span class="comment">// 设置左侧视口</span></span><br><span class="line">  <span class="comment">// TODO</span></span><br><span class="line">  gl.viewport(canvas.width * <span class="number">0.5</span>, <span class="number">0</span>, canvas.width * <span class="number">0.5</span>, canvas.height); <span class="comment">// 设置右侧视口</span></span><br><span class="line">  <span class="comment">// TODO</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>左、右侧视口的渲染宽度为<code>canvas</code>宽度的<code>1/2</code>，左视口起始点为<code>(0,0)</code>，右视口的起始点坐标为<code>(canvas.width * 0.5, 0)</code>。</p>
+<h3 id="2-2-使用VRFrameData动态渲染"><a href="#2-2-使用VRFrameData动态渲染" class="headerlink" title="2.2 使用VRFrameData动态渲染"></a>2.2 使用<a href="https://developer.mozilla.org/en-US/docs/Web/API/VRFrameData" target="_blank" rel="noopener">VRFrameData</a>动态渲染</h3><p>前面介绍了WebVR渲染需要根据用户行为动态绘制每一帧场景，具体做法是：<br>1）通过WebVR API提供的<code>VRFrameData</code>实例获取当前帧的视图矩阵和投影矩阵；<br>2）将视图-投影矩阵传入着色器进行绘制；<br>3）生成下一帧数据并提交给当前canvas；<br>4）进入下一帧回调。<br>具体代码如下</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">draw</span>(<span class="params">gl,frameData,u_MvpMatrix</span>) </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> &#123;</span><br><span class="line">    leftProjectionMatrix,</span><br><span class="line">    leftViewMatrix,</span><br><span class="line">    rightProjectionMatrix,</span><br><span class="line">    rightViewMatrix</span><br><span class="line">  &#125; = frameData;</span><br><span class="line">  <span class="comment">// 初始化模型矩阵，模型-视图-投影矩阵</span></span><br><span class="line">  <span class="keyword">let</span> modelMatrix = mat4.create(),</span><br><span class="line">      vpMatrix = mat4.create(),</span><br><span class="line">      mvpMatrix = mat4.create();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 将左眼视图渲染到画布的左侧</span></span><br><span class="line">  gl.viewport(<span class="number">0</span>, <span class="number">0</span>, canvas.width * <span class="number">0.5</span>, canvas.height);</span><br><span class="line">  <span class="comment">// mvpMatrix = ProjectionMatrix × ViewMatrix × modelMatrix</span></span><br><span class="line">  <span class="comment">// 这里使用gl-matrix.js的mat4对象对float32Array进行矩阵操作</span></span><br><span class="line">  mat4.multiply(vpMatrix,leftProjectionMatrix,leftViewMatrix);</span><br><span class="line">  mat4.multiply(mvpMatrix,vpMatrix,modelMatrix);</span><br><span class="line">  <span class="comment">// 将模型-视图-投影矩阵mvpMatrix传入着色器</span></span><br><span class="line">  gl.uniformMatrix4fv(u_MvpMatrix, <span class="literal">false</span>, mvpMatrix);</span><br><span class="line">  <span class="comment">// 左侧绘图</span></span><br><span class="line">  gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 将右眼视图渲染到画布的右侧</span></span><br><span class="line">  gl.viewport(canvas.width * <span class="number">0.5</span>, <span class="number">0</span>, canvas.width * <span class="number">0.5</span>, canvas.height);</span><br><span class="line">  mat4.multiply(vpMatrix,rightProjectionMatrix,rightViewMatrix);</span><br><span class="line">  mat4.multiply(mvpMatrix,vpMatrix,modelMatrix);</span><br><span class="line">  gl.uniformMatrix4fv(u_MvpMatrix, <span class="literal">false</span>, mvpMatrix);</span><br><span class="line">  gl.drawElements(gl.TRIANGLES, n, gl.UNSIGNED_SHORT, <span class="number">0</span>);</span><br><span class="line"></span><br><span class="line">  <span class="comment">// 生成下一帧数据并覆盖原来的frameData</span></span><br><span class="line">  vrDisplay.getFrameData(frameData);</span><br><span class="line">  vrDisplay.submitFrame();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先，在动画渲染前通过<code>new VRFrameData()</code>获得实例<code>frameData</code>，并传入动画渲染函数；<br>接着，在动画函数里获取frameData的属性：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">VRFrameData实例属性</th>
+<th style="text-align:left"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">leftProjectionMatrix</td>
+<td style="text-align:left">左视口投影矩阵</td>
+</tr>
+<tr>
+<td style="text-align:left">leftViewMatrix</td>
+<td style="text-align:left">左视口视图矩阵</td>
+</tr>
+<tr>
+<td style="text-align:left">rightProjectionMatrix</td>
+<td style="text-align:left">右视口投影矩阵</td>
+</tr>
+<tr>
+<td style="text-align:left">rightViewMatrix</td>
+<td style="text-align:left">右视口视图矩阵</td>
+</tr>
+</tbody>
+</table>
+<p>当然<code>VRFrameData</code>还包括<code>pose</code>、<code>orientation</code>等属性这里就不一一列举了。<br>根据公式分别计算出左右视口的模型-视图-投影矩阵，传给顶点着色器程序，与顶点缓冲区的顶点坐标相乘绘制出最终顶点。</p>
+<blockquote>
+<p>MvpMatrix = ProjectionMatrix × ViewMatrix × modelMatrix</p>
+</blockquote>
+<p>最后，在每一帧动画回调结束前，我们调用<code>vrDisplay.getFrameData(frameData)</code>来生成下一帧数据并覆盖frameData，并使用<code>vrDisplay.submitFrame()</code>将当前帧提交给当前画布渲染。</p>
+<p>至此，WebVR的开发流程已基本走完，具体代码可以参考下方demo<br><img src="http://upload-images.jianshu.io/upload_images/1939855-2deb638717d350a5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt><br>项目代码：<a href="https://github.com/YoneChen/webvr-demo" target="_blank" rel="noopener">https://github.com/YoneChen/webvr-demo</a></p>
+<h1 id="结语"><a href="#结语" class="headerlink" title="结语"></a>结语</h1><p>使用原生WebGL开发WebVR应用相比three.js或者a-frame代码要复杂很多，不过通过这种方式却能更深入的了解WebVR的工作原理，其中最核心的是使用WebVR的<code>VRFrame</code>生成渲染矩阵，以及使用WebGL的<code>viewport</code>进行分屏。</p>
+<p>想了解three.js开发webvr，可参考<a href="https://zhuanlan.zhihu.com/p/25567905" target="_blank" rel="noopener">《VR大潮来袭—前端开发能做些什么》</a><br>也欢迎各位关注我的专栏 <a href="https://zhuanlan.zhihu.com/c_99472965" target="_blank" rel="noopener">WebVR技术庄园</a>，不定期更新~</p>
+<p>相关资料：<br>计算机图形知识：<a href="http://www.opengl-tutorial.org/cn/beginners-tutorials/tutorial-3-matrices/" target="_blank" rel="noopener">矩阵变换</a><br>WebGL快速入门：<a href="http://taobaofed.org/blog/2015/12/21/webgl-handbook/" target="_blank" rel="noopener">WebGL 技术储备指南</a><br>谷歌开发者 | WebVR：<a href="https://developers.google.com/web/fundamentals/vr/" target="_blank" rel="noopener">WebVR基本原理</a><br>MDN | WebVR API：<a href="https://developer.mozilla.org/en-US/docs/Web/API/WebVR_API/Using_the_WebVR_API" target="_blank" rel="noopener">使用WebVR API</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/webvr/" rel="tag"># webvr</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/07/05/webvr-learning-2/" rel="next" title="WebVR教程--标准入门">
+                <i class="fa fa-chevron-left"></i> WebVR教程--标准入门
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/05/webvr-project/" rel="prev" title="WebVR工程搭建">
+                WebVR工程搭建 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <p class="site-author-name" itemprop="name">Yone Chen</p>
+            <p class="site-description motion-element" itemprop="description">技术空间站</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives/">
+            
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#WebVR与WebVR-API"><span class="nav-number">1.</span> <span class="nav-text">WebVR与WebVR API</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#WebVR的开发环境配置"><span class="nav-number">2.</span> <span class="nav-text">WebVR的开发环境配置</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#PC端调试"><span class="nav-number">2.1.</span> <span class="nav-text">PC端调试</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-安装chrome扩展程序-WebVR-API-Emulation"><span class="nav-number">2.1.0.1.</span> <span class="nav-text">1. 安装chrome扩展程序 WebVR API Emulation</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#移动端调试"><span class="nav-number">2.2.</span> <span class="nav-text">移动端调试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-安装chrome-beta"><span class="nav-number">2.2.1.</span> <span class="nav-text">1. 安装chrome beta</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-安装Google-VR-服务"><span class="nav-number">2.2.2.</span> <span class="nav-text">2. 安装Google VR 服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-chrome-inspector调试"><span class="nav-number">2.2.3.</span> <span class="nav-text">3. chrome inspector调试</span></a></li></ol></li></ol><li class="nav-item nav-level-1"><a class="nav-link" href="#使用WebGL开发WebVR"><span class="nav-number">3.</span> <span class="nav-text">使用WebGL开发WebVR</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#一、VR数据初始化"><span class="nav-number">3.1.</span> <span class="nav-text">一、VR数据初始化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#二、WebGL初始化"><span class="nav-number">3.2.</span> <span class="nav-text">二、WebGL初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#GLSL着色器程序"><span class="nav-number">3.2.1.</span> <span class="nav-text">GLSL着色器程序</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#三、动画渲染"><span class="nav-number">3.3.</span> <span class="nav-text">三、动画渲染</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-requestAnimationFrame创建动画"><span class="nav-number">3.3.1.</span> <span class="nav-text">1. requestAnimationFrame创建动画</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-VR渲染"><span class="nav-number">3.3.2.</span> <span class="nav-text">2. VR渲染</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-使用viewport设置双视口"><span class="nav-number">3.3.2.1.</span> <span class="nav-text">2.1 使用viewport设置双视口</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-使用VRFrameData动态渲染"><span class="nav-number">3.3.3.</span> <span class="nav-text">2.2 使用VRFrameData动态渲染</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#结语"><span class="nav-number">4.</span> <span class="nav-text">结语</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yone Chen</span> |
+  <a link="https://beian.miit.gov.cn/">粤ICP备17126485号</a>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

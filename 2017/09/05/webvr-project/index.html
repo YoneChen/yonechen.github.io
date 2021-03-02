@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Yone, YoneChen">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="本文旨在介绍如何搭建WebVR工程以支持多场景开发。  首先，作为一个基本的前端工程来说，我们需要让代码“工程化”，不仅要提供编译构建、压缩打包功能，还要让每个页面模块化；延伸到WebVR工程，我们也需要考虑就必须考虑“多页面”模块化，即提供多个场景模块化开发，因为一个完整的WebVR App不仅仅只有一个场景。这里可以参考google的WebVR多场景示例：https://vr.chromee">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebVR工程搭建">
+<meta property="og:url" content="https://www.yonechen.com/2017/09/05/webvr-project/index.html">
+<meta property="og:site_name" content="Yone Chen">
+<meta property="og:description" content="本文旨在介绍如何搭建WebVR工程以支持多场景开发。  首先，作为一个基本的前端工程来说，我们需要让代码“工程化”，不仅要提供编译构建、压缩打包功能，还要让每个页面模块化；延伸到WebVR工程，我们也需要考虑就必须考虑“多页面”模块化，即提供多个场景模块化开发，因为一个完整的WebVR App不仅仅只有一个场景。这里可以参考google的WebVR多场景示例：https://vr.chromee">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-d297ff30b0aae115.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-7582fd9a016287be.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-ed0e7db5aa823999.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-edb75bebc55a458d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-bc93667d702feed0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-90b6cae5e8035ba8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-09-16T04:04:37.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WebVR工程搭建">
+<meta name="twitter:description" content="本文旨在介绍如何搭建WebVR工程以支持多场景开发。  首先，作为一个基本的前端工程来说，我们需要让代码“工程化”，不仅要提供编译构建、压缩打包功能，还要让每个页面模块化；延伸到WebVR工程，我们也需要考虑就必须考虑“多页面”模块化，即提供多个场景模块化开发，因为一个完整的WebVR App不仅仅只有一个场景。这里可以参考google的WebVR多场景示例：https://vr.chromee">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1939855-d297ff30b0aae115.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.yonechen.com/2017/09/05/webvr-project/">
+
+
+
+
+
+  <title>WebVR工程搭建 | Yone Chen</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yone Chen</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cases">
+          <a href="/cases/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            cases
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.yonechen.com/2017/09/05/webvr-project/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yone Chen">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yone Chen">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WebVR工程搭建</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-05T20:18:51+08:00">
+                2017-09-05
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="http://upload-images.jianshu.io/upload_images/1939855-d297ff30b0aae115.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<p>本文旨在介绍如何搭建WebVR工程以支持多场景开发。</p>
+<hr>
+<p>首先，作为一个基本的前端工程来说，我们需要让代码“工程化”，不仅要提供编译构建、压缩打包功能，还要让每个页面模块化；<br>延伸到WebVR工程，我们也需要考虑就必须考虑“多页面”模块化，即提供多个场景模块化开发，因为一个完整的WebVR App不仅仅只有一个场景。这里可以参考google的WebVR多场景示例：<a href="https://vr.chromeexperiments.com/" target="_blank" rel="noopener">https://vr.chromeexperiments.com/</a></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-7582fd9a016287be.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="webvr多场景应用"></p>
+<p>多场景开发，最简单的方式就是，一个场景对应一份html、css、js，多个页面需要多个html，每次页面跳转需要重新进行VR渲染进行初始化。<br>实际上我们在多场景中，场景初始化只需要执行一次（比如，创建一个场景-&gt;创建相机-&gt;创建渲染器），我们只需要一个index.html作为入口页面，将VR场景初始化、创建、回收、切换封装成公用组件。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-ed0e7db5aa823999.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="WebVR场景切换，用户的耐心是有限的"></p>
+<p>在首次进入场景时进行初始化，在需要场景切换时进行场景回收和按需加载，这样一来，用户切换场景时，不用把时间浪费在等待html和初始化场景上。基于以上思路，本人总结的一套WebVR工程搭建方案，供各位参考。</p>
+<p>项目地址：<a href="https://github.com/YoneChen/webvr-webpack2-boilerplate" target="_blank" rel="noopener">https://github.com/YoneChen/webvr-webpack2-boilerplate</a><br>Demo：<a href="https://YoneChen.github.io/webvr-webpack2-boilerplate/dist/" target="_blank" rel="noopener">https://YoneChen.github.io/webvr-webpack2-boilerplate/dist/</a><br>相关技术栈：<code>three.js</code>、<code>webpack2</code>、<code>es6/7</code><br>想详细了解WebVR开发步骤，也欢迎参考我的文章<a href="http://www.jianshu.com/p/c9c03e14ba9d" target="_blank" rel="noopener">《VR大潮来袭——前端开发能做些什么》</a></p>
+<h3 id="实现功能"><a href="#实现功能" class="headerlink" title="实现功能"></a>实现功能</h3><ul>
+<li>VR多场景模块化开发</li>
+<li>支持VR场景创建、回收、切换</li>
+<li>项目自动化构建与压缩打包</li>
+<li>支持es7/6</li>
+</ul>
+<h3 id="WebVR相关库"><a href="#WebVR相关库" class="headerlink" title="WebVR相关库"></a>WebVR相关库</h3><ul>
+<li>three.js</li>
+<li>vrcontrols.js</li>
+<li>vreffect.js</li>
+<li>webvr-manager.js</li>
+<li>webvr-polyfill.js</li>
+<li>three-onevent.js</li>
+</ul>
+<h3 id="主要目录结构"><a href="#主要目录结构" class="headerlink" title="主要目录结构"></a>主要目录结构</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">webpack</span><br><span class="line">|-- webpack.config.js       # 公共配置</span><br><span class="line">|-- webpack.dev.js          # 开发配置</span><br><span class="line">|-- webpack.prod.js         # 生产配置</span><br><span class="line">src                         # 项目源码</span><br><span class="line">|-- page                    # WebVR场景目录       </span><br><span class="line">|   |-- index.js            # WebVR入口场景              </span><br><span class="line">|   |-- page1.js</span><br><span class="line">|   |-- page2.js                                            </span><br><span class="line">|-- common                  # 公共目录，包括webvr封装类和polyfill</span><br><span class="line">|   |-- VRCore.js</span><br><span class="line">|   |-- VRPage.js</span><br><span class="line">|   |-- vendor.js</span><br><span class="line">|-- lib                     # vr三方插件，包括相机控制器和分屏器</span><br><span class="line">|   |-- vrcontrol.js </span><br><span class="line">|   |-- vreffect.js </span><br><span class="line">|-- assets                  # 素材目录，包括3d模型、纹理、音频等</span><br><span class="line">|   |-- audio                      </span><br><span class="line">|   |-- model</span><br><span class="line">|   |-- texture</span><br><span class="line">|-- index.html              # WebVR公用页面</span><br><span class="line">package.json                        </span><br><span class="line">READNE.md</span><br></pre></td></tr></table></figure>
+<p>我们先来看看index.html，其实整个body就只有一个dom，用来append我们的<code>canvas</code>，毕竟所以场景都在<code>canvas</code>里运行。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">&lt;!DOCTYPE html&gt;</span><br><span class="line">&lt;html lang=&quot;en&quot;&gt;</span><br><span class="line">&lt;head&gt;</span><br><span class="line">	&lt;meta charset=&quot;UTF-8&quot;&gt;</span><br><span class="line">	&lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0, shrink-to-fit=no&quot;&gt;</span><br><span class="line">	&lt;title&gt;webVR-INDEX&lt;/title&gt;</span><br><span class="line">&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">  &lt;section class=&quot;webvr-container&quot;&gt;</span><br><span class="line">  &lt;/section&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure></p>
+<p>有了公用html，我们希望这样开发WebVR应用，即一个场景对应一个js脚本，形如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">// 继承VRPage父类，开发每一个场景</span><br><span class="line">import VRPage from &apos;common/js/VRPage&apos;;</span><br><span class="line"></span><br><span class="line">class Page1 extends VRPage &#123;</span><br><span class="line">	start() &#123; // 启动渲染之前，创建场景3d模型</span><br><span class="line">		let geometry = new THREE.CubeGeometry(5,5,5);</span><br><span class="line">		let material = new THREE.MeshBasicMaterial( &#123; color:0x00aadd&#125; );</span><br><span class="line">		this.box = new THREE.Mesh(geometry,material);</span><br><span class="line">		this.box.position.set(3,-2,-3);</span><br><span class="line">		WebVR.Scene.add(this.box);</span><br><span class="line">	&#125;</span><br><span class="line">    loaded() &#123; // 场景资源加载完毕，可执行音频播放等。</span><br><span class="line">    &#125;</span><br><span class="line">	update(delta) &#123; // 开启渲染之后，执行模型动画</span><br><span class="line">		this.box.rotation.y += 0.05;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">export default (() =&gt; &#123;</span><br><span class="line">	return new Page1();</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure>
+<p>这里参照了类似Unity3d和React的开发模式，在start方法里创建3d模型，在update方法里处理3d动画，这样的好处在于：</p>
+<ol>
+<li>每一个场景都可以进行独立开发而互不影响；</li>
+<li>一旦VR环境初始化之后，不需要在每次场景跳转切换时重新初始化一遍。</li>
+</ol>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-edb75bebc55a458d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="WebVR多场景运行机制"></p>
+<p>VRCore.js作为公用模块管理整个webvr应用的所有子场景，包括场景初始化、VR相机渲染、场景切换、场景回收等静态函数。<br>VRPage.js作为每个场景的工厂类，支持不同3d页面（场景）之间的代码独立。<br>每一个VR页面的生命周期都是：创建物体-&gt;加载模型-&gt;启动渲染的过程，因此，需要创建一个基类，来实现每一个VR场景实例的生命周期。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">//common/VRPage.js</span><br><span class="line">import * as WebVR from &apos;VRCore.js&apos; //管理所有场景的公用模块</span><br><span class="line">// VR场景工厂</span><br><span class="line">export default class VRPage &#123;</span><br><span class="line">	constructor(options=&#123;&#125;) &#123;</span><br><span class="line">        // 创建场景，如果场景已初始化</span><br><span class="line">		WebVR.createScene(options);</span><br><span class="line">		this.start();</span><br><span class="line">        this.loadPage();</span><br><span class="line">	&#125;</span><br><span class="line">    loadPage() &#123;</span><br><span class="line">        THREE.DefaultLoadingManager.onLoad = () =&gt; &#123;</span><br><span class="line">            // 模型加载完毕，即开启渲染</span><br><span class="line">        	WebVR.renderStart(this.update);</span><br><span class="line">            this.loaded(); </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">	start() &#123; </span><br><span class="line">         // 实例的start方法将在启动渲染之前，场景相机初始化后执行。</span><br><span class="line">	&#125;</span><br><span class="line">    loaded() &#123;</span><br><span class="line">        // 实例的loaded方法将在场景资源加载后执行。</span><br><span class="line">    &#125;</span><br><span class="line">	update(delta) &#123; </span><br><span class="line">        // 实例的update方法将在渲染器每一次渲染时执行。</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里使用<code>THREE.DefaultLoadingManager.onLoad</code>方法监听场景是否加载完毕，一旦加载完毕，便启动渲染。</p>
+<h3 id="WebVR场景首次渲染"><a href="#WebVR场景首次渲染" class="headerlink" title="WebVR场景首次渲染"></a>WebVR场景首次渲染</h3><p>主要包括四个步骤</p>
+<blockquote>
+<ol>
+<li>新建场景</li>
+</ol>
+<ul>
+<li>创建VR相机</li>
+<li>加载场景脚本与资源</li>
+<li>开启动画渲染</li>
+</ul>
+</blockquote>
+<h5 id="VR环境初始化"><a href="#VR环境初始化" class="headerlink" title="VR环境初始化"></a>VR环境初始化</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">function createScene(&#123;domContainer=document.body,fov=70,far=4000&#125;) &#123;</span><br><span class="line">	// 创建场景</span><br><span class="line">	Scene = new THREE.Scene();</span><br><span class="line">	// 创建相机</span><br><span class="line">	Camera = new THREE.PerspectiveCamera(fov,window.innerWidth/window.innerHeight,0.1,far);</span><br><span class="line">	Camera.position.set( 0, 0, 0 );</span><br><span class="line">	Scene.add(Camera);</span><br><span class="line">	// 创建渲染器</span><br><span class="line">	Renderer = new THREE.WebGLRenderer(&#123; antialias: true &#125; );</span><br><span class="line">	Renderer.setSize(window.innerWidth,window.innerHeight);</span><br><span class="line">	Renderer.shadowMapEnabled = true;</span><br><span class="line">	Renderer.setPixelRatio(window.devicePixelRatio);</span><br><span class="line">	domContainer.appendChild(Renderer.domElement);</span><br><span class="line">	initVR();</span><br><span class="line">	resize();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>首先是three.js开发三部曲，创建场景、相机、渲染器，接着调用<code>initVR</code>函数来完成VR场景分屏和陀螺仪控制，WebVR基本开发步骤可以参考。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">function initVR() &#123;</span><br><span class="line">	// 初始化VR分屏器和控制器</span><br><span class="line">	Effect = new THREE.VREffect(Renderer);</span><br><span class="line">	Controls = new THREE.VRControls(Camera);</span><br><span class="line">	// 初始化VR管理器</span><br><span class="line">	Manager = new WebVRManager(Renderer, Effect);</span><br><span class="line">	window.addEventListener( &apos;resize&apos;, e =&gt; &#123;</span><br><span class="line">		// 调整渲染器和相机以适应窗口拉伸时宽高变动</span><br><span class="line">		Camera.aspect = window.innerWidth / window.innerHeight;</span><br><span class="line">		Camera.updateProjectionMatrix();</span><br><span class="line">		Effect.setSize(window.innerWidth, window.innerHeight);</span><br><span class="line">	&#125;, false );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="开启动画渲染"><a href="#开启动画渲染" class="headerlink" title="开启动画渲染"></a>开启动画渲染</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">// VRCore.js</span><br><span class="line">function renderStart(callback) &#123;</span><br><span class="line">	// 设置loopID变量记录每一帧ID</span><br><span class="line">	loopID = 0;</span><br><span class="line">	const loop = () =&gt; &#123;</span><br><span class="line">		if(loopID === -1) return;</span><br><span class="line">		loopID = requestAnimationFrame(loop);</span><br><span class="line">		callback();</span><br><span class="line">		Controls.update();</span><br><span class="line">		Manager.render(Scene, Camera);</span><br><span class="line">	&#125;;</span><br><span class="line">	loop();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里传入参数动画渲染做了三件事，使用loopID作为整个VR应用的全局变量，记录每一帧动画的更新；更新相机控制器和VR渲染器，</p>
+<h3 id="WebVR场景切换"><a href="#WebVR场景切换" class="headerlink" title="WebVR场景切换"></a>WebVR场景切换</h3><p>主要包括四个步骤</p>
+<blockquote>
+<ol>
+<li>暂停渲染</li>
+</ol>
+<ul>
+<li>清空当前场景物体</li>
+<li>请求并加载目标场景脚本与资源</li>
+<li>重启渲染</li>
+</ul>
+</blockquote>
+<h5 id="暂停动画渲染"><a href="#暂停动画渲染" class="headerlink" title="暂停动画渲染"></a>暂停动画渲染</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">function renderStop() &#123;</span><br><span class="line">	if (loopID !== -1) &#123;</span><br><span class="line">		window.cancelAnimationFrame(loopID);</span><br><span class="line">		loopID = -1;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="回收当前场景"><a href="#回收当前场景" class="headerlink" title="回收当前场景"></a>回收当前场景</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">function clearScene() &#123;</span><br><span class="line">	for(let i = Scene.children.length - 1; i &gt;= 0; i-- ) &#123;</span><br><span class="line">		Scene.remove(Scene.children[i]);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h5 id="按需加载"><a href="#按需加载" class="headerlink" title="按需加载"></a>按需加载</h5><p>切换到下一场景，我们需要请求对应的场景脚本，这里使用webpack2的<a href="https://webpack.js.org/guides/code-splitting-async/#dynamic-import-import-" target="_blank" rel="noopener">import</a>函数进行代码分离，当然你也可以使用<code>require.ensure(filename =&gt; {require(filename)})</code>方法。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">import(`page/$&#123;fileName&#125;.js`);</span><br></pre></td></tr></table></figure></p>
+<p>最终将清空当前场景与请求加载目标场景功能封装为<code>forward</code>跳转方法，就可以在页面里直接调用了。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">// common/VRCore.js</span><br><span class="line">function forward(fileName) &#123;</span><br><span class="line">    renderStop();</span><br><span class="line">	clearScene();</span><br><span class="line">	import(`page/$&#123;fileName&#125;.js`);</span><br><span class="line">&#125;</span><br><span class="line">// page/index.js</span><br><span class="line">...</span><br><span class="line">class Index extends VRPage &#123;</span><br><span class="line">    start() &#123;</span><br><span class="line">		let geometry = new THREE.CubeGeometry(5,5,5);</span><br><span class="line">		let material = new THREE.MeshBasicMaterial(&#123; </span><br><span class="line">			color: 0x00aadd</span><br><span class="line">		&#125;);</span><br><span class="line">		this.box = new THREE.Mesh(geometry,material);</span><br><span class="line">		this.box.position.set(3,-2,-3);</span><br><span class="line">		// add gaze eventLisenter</span><br><span class="line">		this.box.on(&apos;gaze&apos;,mesh =&gt; &#123; // gazeIn trigger</span><br><span class="line">			WebVR.forward(&apos;page2.js&apos;);</span><br><span class="line">		&#125;);</span><br><span class="line">		WebVR.Scene.add(box);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">...</span><br><span class="line">// page2.js</span><br><span class="line">class page2 extends VRPage &#123;</span><br><span class="line">	start() &#123;</span><br><span class="line">		this.addPanorama(1000, ASSET_TEXTURE_SKYBOX);</span><br><span class="line">	&#125;</span><br><span class="line">	addPanorama(radius,path) &#123;</span><br><span class="line">		// create panorama</span><br><span class="line">		let geometry = new THREE.SphereGeometry(radius,50,50);</span><br><span class="line">		let material = new THREE.MeshBasicMaterial( &#123; map: new THREE.TextureLoader().load(path),side:THREE.BackSide &#125; );</span><br><span class="line">		let panorama = new THREE.Mesh(geometry,material);</span><br><span class="line">		WebVR.Scene.add(panorama);</span><br><span class="line">		return panorama;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">export default (() =&gt; &#123;</span><br><span class="line">	return new page2();</span><br><span class="line">&#125;)();</span><br></pre></td></tr></table></figure></p>
+<p>我们在场景里创建一个立方体，当凝视到该物体时，执行<code>forward</code>方法跳转至<code>page2</code>场景。<br><img src="http://upload-images.jianshu.io/upload_images/1939855-bc93667d702feed0.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt><br>至此，我们的WebVR工程已经完成了一半，接下来，我们使用Webpack2来构建我们的工程。</p>
+<h3 id="webpack配置"><a href="#webpack配置" class="headerlink" title="webpack配置"></a>webpack配置</h3><p>开发环境和生产环境下webpack配置略有不同，这里主要给出webpack的基本配置，具体可参考项目地址。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">const path = require(&apos;path&apos;);</span><br><span class="line">const CommonsChunkPlugin = require(&apos;webpack/lib/optimize/CommonsChunkPlugin&apos;);</span><br><span class="line">const HtmlWebpackPlugin = require(&apos;html-webpack-plugin&apos;);</span><br><span class="line">const ProvidePlugin = require(&apos;webpack/lib/ProvidePlugin&apos;);</span><br><span class="line"></span><br><span class="line">module.exports = &#123;</span><br><span class="line"></span><br><span class="line">  entry: &#123;</span><br><span class="line">    &apos;vendor&apos;: &apos;./src/common/js/vendor.js&apos;,</span><br><span class="line">    &apos;app&apos;: &apos;./src/page/index.js&apos;</span><br><span class="line">  &#125;,</span><br><span class="line"></span><br><span class="line">  output: &#123;</span><br><span class="line">    path: path.resolve(__dirname, &apos;../dist/&apos;),</span><br><span class="line">    filename: &apos;[name].js&apos;,</span><br><span class="line">    sourceMapFilename: &apos;[name].map&apos;,</span><br><span class="line">    chunkFilename: &apos;[id]-chunk.js&apos;,</span><br><span class="line">    publicPath: &apos;/&apos;</span><br><span class="line">  &#125;,</span><br></pre></td></tr></table></figure>
+<p>这里我们将webvr首个场景<code>src/page/index.js</code>作为项目打包入口，同时将page目录下的文件也作为单独chunk，配合按需加载来支持场景切换。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">module: &#123;</span><br><span class="line">  rules: [</span><br><span class="line">    &#123;</span><br><span class="line">      test: /\.js/,</span><br><span class="line">      exclude: /node_modules/,</span><br><span class="line">      use: [</span><br><span class="line">        &#123; loader:&apos;babel-loader&apos;,options: &#123; </span><br><span class="line">          presets: [&quot;latest&quot;,[&quot;es2015&quot;, &#123;&quot;modules&quot;: false&#125;]] </span><br><span class="line">        &#125;</span><br><span class="line">      ]</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      test: /\.css/,</span><br><span class="line">      use: [&apos;style-loader&apos;,&apos;css-loader&apos;]</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      test: /\.(jpg|png|mp4|wav|ogg|obj|mtl|dae)$/,</span><br><span class="line">      loader: &apos;file-loader&apos;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line"></span><br><span class="line">&#125;,</span><br></pre></td></tr></table></figure></p>
+<p>这里引入file-loader，这样就能在场景里直接<code>import</code>需要用到的素材，如下。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">//page/page2.js</span><br><span class="line">import ASSET_TEXTURE_SKYBOX from &apos;assets/texture/360_page2.jpg&apos;;</span><br></pre></td></tr></table></figure></p>
+<p>webpack相关的plugin配置如下<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">  plugins: [</span><br><span class="line">    new CommonsChunkPlugin(&#123;</span><br><span class="line">      name: [&apos;app&apos;, &apos;vendor&apos;],</span><br><span class="line">      minChunks: Infinity</span><br><span class="line">    &#125;),</span><br><span class="line">    new ProvidePlugin(&#123;</span><br><span class="line">      &apos;THREE&apos;: &apos;three&apos;，</span><br><span class="line">      &apos;WebVR&apos;: path.resolve(__dirname,&apos;../src/common/js/VRCore.js&apos;)</span><br><span class="line">    &#125;),</span><br><span class="line">    new HtmlWebpackPlugin(&#123;</span><br><span class="line">      inject: true,</span><br><span class="line">      template: path.resolve(__dirname, &apos;../src/index.html&apos;),</span><br><span class="line">      favicon: path.resolve(__dirname, &apos;../src/favicon.ico&apos;)</span><br><span class="line">    &#125;)</span><br><span class="line">  ]</span><br><span class="line"></span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure></p>
+<p>使用<code>ProvidePlugin</code>将<code>three.js</code>作为公用模块输出，以省去在每个脚本<code>import THREE from &#39;three&#39;</code>的重复工作，同时将管理所有场景的核心模块<code>VRCore.js</code>作为全局公用模块输出。<br>使用<code>HtmlWebpackPlugin</code>将公用的html打包到<code>dist</code>目录下。</p>
+<h3 id="polyfill配置"><a href="#polyfill配置" class="headerlink" title="polyfill配置"></a>polyfill配置</h3><p>最后是polyfill配置，我们需要引入webvr-polyfill和babel-polyfill来分别支持webvr API和ES6 API，并作为一个页面独立脚本。<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// common/vendor.js</span><br><span class="line">import &apos;babel-polyfill&apos;;</span><br><span class="line">import &apos;webvr-polyfill&apos;;</span><br></pre></td></tr></table></figure></p>
+<p>以上WebVR工程已经基本搭建完毕，欢迎各位提出宝贵意见，后续我们将探索daydream和Oculus在webvr上的开发模式，敬请期待。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-90b6cae5e8035ba8.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<p>最后，献上前几天在google开发者网站上看到的：预测未来，不如创造未来。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/08/15/webvr-learning-1/" rel="next" title="WebVR教程--深度剖析">
+                <i class="fa fa-chevron-left"></i> WebVR教程--深度剖析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/09/16/webvr-gaze/" rel="prev" title="WebVR教程--Cardboard与凝视事件">
+                WebVR教程--Cardboard与凝视事件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <p class="site-author-name" itemprop="name">Yone Chen</p>
+            <p class="site-description motion-element" itemprop="description">技术空间站</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives/">
+            
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#实现功能"><span class="nav-number">1.</span> <span class="nav-text">实现功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WebVR相关库"><span class="nav-number">2.</span> <span class="nav-text">WebVR相关库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#主要目录结构"><span class="nav-number">3.</span> <span class="nav-text">主要目录结构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#WebVR场景首次渲染"><span class="nav-number">4.</span> <span class="nav-text">WebVR场景首次渲染</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#VR环境初始化"><span class="nav-number">4.0.1.</span> <span class="nav-text">VR环境初始化</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#开启动画渲染"><span class="nav-number">4.0.2.</span> <span class="nav-text">开启动画渲染</span></a></li></ol></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#WebVR场景切换"><span class="nav-number">5.</span> <span class="nav-text">WebVR场景切换</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#暂停动画渲染"><span class="nav-number">5.0.1.</span> <span class="nav-text">暂停动画渲染</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#回收当前场景"><span class="nav-number">5.0.2.</span> <span class="nav-text">回收当前场景</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#按需加载"><span class="nav-number">5.0.3.</span> <span class="nav-text">按需加载</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#webpack配置"><span class="nav-number">6.</span> <span class="nav-text">webpack配置</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#polyfill配置"><span class="nav-number">7.</span> <span class="nav-text">polyfill配置</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yone Chen</span> |
+  <a link="https://beian.miit.gov.cn/">粤ICP备17126485号</a>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

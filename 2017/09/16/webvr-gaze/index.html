@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="Yone, YoneChen">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="Cardboard与gaze注视Cardboard可以说是手机VR头显的元老了，狭义上指的是Google推出的一个带有双凸透镜的盒子，广义上则表示智能手机+盒子的VR体验平台。 它的交互方式较为简单，利用了手机的陀螺仪，采用gaze注视行为来触发场景里的事件，比如用户在虚拟商店中注视一款商品时，弹出这个商品的价格信息。  注视事件是WebVR最基本的交互方式，用户通过头部运动改变视线朝向，当用户">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebVR教程--Cardboard与凝视事件">
+<meta property="og:url" content="https://www.yonechen.com/2017/09/16/webvr-gaze/index.html">
+<meta property="og:site_name" content="Yone Chen">
+<meta property="og:description" content="Cardboard与gaze注视Cardboard可以说是手机VR头显的元老了，狭义上指的是Google推出的一个带有双凸透镜的盒子，广义上则表示智能手机+盒子的VR体验平台。 它的交互方式较为简单，利用了手机的陀螺仪，采用gaze注视行为来触发场景里的事件，比如用户在虚拟商店中注视一款商品时，弹出这个商品的价格信息。  注视事件是WebVR最基本的交互方式，用户通过头部运动改变视线朝向，当用户">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-452bb00376888183.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-ff5d433047e6dea5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-da4409b4de3bfe69.gif?imageMogr2/auto-orient/strip">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-b82f2b552d54b6d7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-246a238334c4d98d.gif?imageMogr2/auto-orient/strip">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-2397af1410c28ffc.gif?imageMogr2/auto-orient/strip">
+<meta property="og:updated_time" content="2017-12-07T10:19:22.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WebVR教程--Cardboard与凝视事件">
+<meta name="twitter:description" content="Cardboard与gaze注视Cardboard可以说是手机VR头显的元老了，狭义上指的是Google推出的一个带有双凸透镜的盒子，广义上则表示智能手机+盒子的VR体验平台。 它的交互方式较为简单，利用了手机的陀螺仪，采用gaze注视行为来触发场景里的事件，比如用户在虚拟商店中注视一款商品时，弹出这个商品的价格信息。  注视事件是WebVR最基本的交互方式，用户通过头部运动改变视线朝向，当用户">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1939855-452bb00376888183.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.yonechen.com/2017/09/16/webvr-gaze/">
+
+
+
+
+
+  <title>WebVR教程--Cardboard与凝视事件 | Yone Chen</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yone Chen</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cases">
+          <a href="/cases/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            cases
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.yonechen.com/2017/09/16/webvr-gaze/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yone Chen">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yone Chen">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WebVR教程--Cardboard与凝视事件</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-09-16T12:03:07+08:00">
+                2017-09-16
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="http://upload-images.jianshu.io/upload_images/1939855-452bb00376888183.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<h1 id="Cardboard与gaze注视"><a href="#Cardboard与gaze注视" class="headerlink" title="Cardboard与gaze注视"></a>Cardboard与gaze注视</h1><p>Cardboard可以说是手机VR头显的元老了，狭义上指的是Google推出的一个带有双凸透镜的盒子，广义上则表示智能手机+盒子的VR体验平台。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-ff5d433047e6dea5.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="cardboard">它的交互方式较为简单，利用了手机的陀螺仪，采用gaze注视行为来触发场景里的事件，比如用户在虚拟商店中注视一款商品时，弹出这个商品的价格信息。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-da4409b4de3bfe69.gif?imageMogr2/auto-orient/strip" alt="gaze交互"></p>
+<p>注视事件是WebVR最基本的交互方式，用户通过头部运动改变视线朝向，当用户视线正对着物体时，触发物体绑定的事件，具体分为三个基本事件，分别是<code>gazeEnter</code>,<code>gazeTrigger</code>,<code>gazeLeave</code>。</p>
+<p>我们可以设置一个位于相机中心的准心来描述这三个基本事件（准确的说，在VR模式下是两个，分别位于左右相机的中心）</p>
+<ul>
+<li>gazeEnter：当准心进入物体时，即用户注视了物体，触发一次</li>
+<li>gazeLeave：当准心离开物体时，即用户停止注视该物体时，触发一次</li>
+<li>gazeTrigger：当准心处于物体时触发，不同于gazeEnter，gazeTrigger会在每一帧刷触发，直到准心离开物体</li>
+</ul>
+<h1 id="注视事件原理"><a href="#注视事件原理" class="headerlink" title="注视事件原理"></a>注视事件原理</h1><p>注视事件触发条件其实就是物体被用户视线“击中”。在每帧动画渲染中，从准心处沿z轴负方向发出射线，如果射线与物体相交，即物体被射线击中，说明前方的物体被用户注视，这里使用Three提供的raycaster对象,对场景里的3d物体进行射线拾取。</p>
+<p>下面是使用<code>THREE.Raycaster</code>拾取物体的简单例子:</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建射线发射器实例raycaster</span></span><br><span class="line"><span class="keyword">const</span> raycaster = <span class="keyword">new</span> THREE.Raycaster();</span><br><span class="line">raycaster.setFromCamera(origin,camera); <span class="comment">// 设置射线源点</span></span><br><span class="line">raycaster.intersectObjects(targetList); <span class="comment">// 检测targetList的object物体是否与射线相交</span></span><br><span class="line"><span class="keyword">if</span> (intersects.length &gt; <span class="number">0</span>) &#123;</span><br><span class="line">    <span class="comment">// 获取从源点触发，与射线相交的首个物体</span></span><br><span class="line">    <span class="keyword">const</span> target = intersects[<span class="number">0</span>].object;</span><br><span class="line">    <span class="comment">// TODO</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>主要分为三步：</p>
+<ol>
+<li><code>new THREE.Raycaster()</code>创建一个射线发射器；</li>
+<li>调用<code>.setFromCamera(origin,camera)</code>设置射线发射源位置，第一个参数origin传入NDC标准化设备坐标，即归一化的屏幕坐标，第二个参数传入相机，此时射线将在屏幕的origin处，沿垂直于相机的近切面的方向进行投射；</li>
+<li>调用<code>.intersectObjects(targetList)</code>检测targetList的物体是否相交</li>
+</ol>
+<p><code>Raycaster</code>借鉴了<a href="https://en.wikipedia.org/wiki/Ray_casting" target="_blank" rel="noopener">光线投射法</a>进行物体拾取，更多用法可参考<a href="https://threejs.org/docs/#api/core/Raycaster" target="_blank" rel="noopener">three.js官方文档</a></p>
+<h2 id="gazeEnter-gazeLeave-gazeTrigger实现"><a href="#gazeEnter-gazeLeave-gazeTrigger实现" class="headerlink" title="gazeEnter, gazeLeave, gazeTrigger实现"></a>gazeEnter, gazeLeave, gazeTrigger实现</h2><p>根据上文对gaze基本事件的描述，现在开始创建注视监听器<code>Gazer</code>类，提供事件绑定<code>on</code>、解绑<code>off</code>、更新<code>update</code>的公用方法，物体可注册<code>gazeEnter</code>,<code>gazeLeave</code>,<code>gazeTrigger</code>事件回调，以下是完整代码。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 注视事件监听器</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Gazer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>() &#123;</span><br><span class="line">        <span class="comment">// 初始化射线发射源</span></span><br><span class="line">        <span class="keyword">this</span>.raycaster = <span class="keyword">new</span> THREE.Raycaster();</span><br><span class="line">        <span class="keyword">this</span>._center = <span class="keyword">new</span> THREE.Vector2();</span><br><span class="line">        <span class="keyword">this</span>.rayList = &#123;&#125;,<span class="keyword">this</span>.targetList = [];</span><br><span class="line">        <span class="keyword">this</span>._lastTarget = <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">/** 物体绑定gaze事件的公用方法</span></span><br><span class="line"><span class="comment">     * @param &#123;THREE.Object3D&#125; target 监听的3d网格</span></span><br><span class="line"><span class="comment">     * @param &#123;String&#125; eventType 事件类型 </span></span><br><span class="line"><span class="comment">     * @param &#123;Function&#125; callback 事件回调</span></span><br><span class="line"><span class="comment">     **/</span></span><br><span class="line">    on(target, eventType, callback) &#123;</span><br><span class="line">        <span class="keyword">const</span> noop = <span class="function"><span class="params">()</span> =&gt;</span> &#123;&#125;;</span><br><span class="line">        <span class="comment">// target首次绑定事件，则创建监听对象，加入raylist监听列表，并将三个基本事件的回调初始为空方法</span></span><br><span class="line">        <span class="keyword">if</span> (!<span class="keyword">this</span>.rayList[target.id]) <span class="keyword">this</span>.rayList[target.id] = &#123; target, <span class="attr">gazeEnter</span>: noop, <span class="attr">gazeTrigger</span>: noop, <span class="attr">gazeLeave</span>: noop &#125;;</span><br><span class="line">        <span class="comment">// 根据传入的 eventType与callback更新事件回调</span></span><br><span class="line">        <span class="keyword">this</span>.rayList[target.id][eventType] = callback;</span><br><span class="line">        <span class="keyword">this</span>.targetList = <span class="built_in">Object</span>.keys(<span class="keyword">this</span>.rayList).map(<span class="function"><span class="params">key</span> =&gt;</span> <span class="keyword">this</span>.rayList[key].target);</span><br><span class="line">    &#125;</span><br><span class="line">    off(target) &#123;</span><br><span class="line">        <span class="keyword">delete</span> <span class="keyword">this</span>.rayList[target.id];</span><br><span class="line">        <span class="keyword">this</span>.targetList = <span class="built_in">Object</span>.keys(<span class="keyword">this</span>.rayList).map(<span class="function"><span class="params">key</span> =&gt;</span> <span class="keyword">this</span>.rayList[key].target);</span><br><span class="line">    &#125;</span><br><span class="line">    update(camera) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>.targetList.length &lt;= <span class="number">0</span>) <span class="keyword">return</span>;</span><br><span class="line">        <span class="comment">//更新射线位置</span></span><br><span class="line">        <span class="keyword">this</span>.raycaster.setFromCamera(<span class="keyword">this</span>._center,camera);</span><br><span class="line">        <span class="keyword">const</span> intersects = <span class="keyword">this</span>.raycaster.intersectObjects(<span class="keyword">this</span>.targetList);</span><br><span class="line">        <span class="keyword">if</span> (intersects.length &gt; <span class="number">0</span>) &#123; <span class="comment">// 当前帧射线击中物体</span></span><br><span class="line">            <span class="keyword">const</span> currentTarget = intersects[<span class="number">0</span>].object;</span><br><span class="line">            <span class="keyword">if</span> (<span class="keyword">this</span>._lastTarget) &#123; <span class="comment">// 上一帧射线击中物体</span></span><br><span class="line">                <span class="keyword">if</span> (<span class="keyword">this</span>._lastTarget.id !== currentTarget.id) &#123; <span class="comment">// 上一帧射线击中物体与当前帧不同</span></span><br><span class="line">                    <span class="keyword">this</span>.rayList[<span class="keyword">this</span>._lastTarget.id].gazeLeave(); </span><br><span class="line">                    <span class="keyword">this</span>.rayList[currentTarget.id].gazeEnter();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123; <span class="comment">// 上一帧射线未击中物体</span></span><br><span class="line">                <span class="keyword">this</span>.rayList[currentTarget.id].gazeEnter(); <span class="comment">// 触发当前帧物体的gazeEnter事件</span></span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">this</span>.rayList[currentTarget.id].gazeTrigger(); <span class="comment">// 当前帧射线击中物体，触发物体的gazeTrigger事件</span></span><br><span class="line">            <span class="keyword">this</span>._lastTarget = currentTarget;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123; <span class="comment">// 当前帧我击中物体</span></span><br><span class="line">            <span class="keyword">if</span> ( <span class="keyword">this</span>._lastTarget ) <span class="keyword">this</span>.rayList[<span class="keyword">this</span>._lastTarget.id].gazeLeave(); <span class="comment">// 触发上一帧物体gazeLeave</span></span><br><span class="line">            <span class="keyword">this</span>._lastTarget = <span class="literal">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下面一起来看<code>Gazer</code>实现的三步曲，这里用“击中”表示射线与物体相交。</p>
+<h3 id="第一步，使用构造函数constructor初始化："><a href="#第一步，使用构造函数constructor初始化：" class="headerlink" title="第一步，使用构造函数constructor初始化："></a>第一步，使用构造函数<code>constructor</code>初始化：</h3><ol>
+<li>初始化射线发射器<code>raycaster</code>实例；</li>
+<li>创建<code>rayList</code>以记录注册gaze事件的物体对象；</li>
+<li>创建<code>lastTarget</code>记录前一帧被射线击中的物体，初始为null。</li>
+</ol>
+<h3 id="第二步，创建on方法提供事件绑定API"><a href="#第二步，创建on方法提供事件绑定API" class="headerlink" title="第二步，创建on方法提供事件绑定API"></a>第二步，创建<code>on</code>方法提供事件绑定API</h3><p>通过调用<code>gazer.on(target,eventType,callback)</code>方式，传入绑定事件的Obect3D对象<code>target</code>，绑定事件类型<code>eventType</code>以及事件回调<code>callback</code>三个参数。</p>
+<ol>
+<li>判断这个target是否存在，不存在，则创建一个监听对象，存在则更新对象里的事件函数。这个对象包括传入的target本身，以及三个基本事件的回调函数（初始值为空方法）：</li>
+</ol>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">this</span>.rayList[target.id] = &#123;</span><br><span class="line">    target,</span><br><span class="line">    gazeEnter,</span><br><span class="line">    gazeTrigger,</span><br><span class="line">    gazeLeave</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>将这个对象以键值对形式赋值给<code>raylist[target.id]</code>监听序列对象；</p>
+<ol start="2">
+<li>将<code>raylist</code>对象处理成<code>[ target1, ..., targetN ]</code>的形式赋值给<code>this.targetList</code>，作为<code>raycaster.intersectObjects</code>的入参。</li>
+</ol>
+<h3 id="第三步，创建update方法，在动画帧中监听三个基本事件是否触发"><a href="#第三步，创建update方法，在动画帧中监听三个基本事件是否触发" class="headerlink" title="第三步，创建update方法，在动画帧中监听三个基本事件是否触发"></a>第三步，创建<code>update</code>方法，在动画帧中监听三个基本事件是否触发</h3><ol>
+<li>调用<code>raycaster.setFromCamera</code>更新射线起点与方向；</li>
+<li>调用<code>raycaster.intersectObjects</code>检测监听序列<code>this.targetList</code>是否有物体与射线相交；</li>
+<li>根据<code>gazeEnter</code>和<code>gazeLeave</code>和<code>gazeTrigger</code>实现的情况，总结了以下这三个事件触发的逻辑图。</li>
+</ol>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-b82f2b552d54b6d7.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="gaze基本事件逻辑图"></p>
+<p>逻辑图里的三个条件用代码表示如下：</p>
+<ul>
+<li>当前帧射线是否击中物体：<code>if (intersects.length &gt; 0)</code></li>
+<li>上一帧射线是否击中物体：<code>if (this._lastTarget)</code></li>
+<li>当前帧射线击中物体是否与上一帧不同：<code>if (this._lastTarget.id !== currentTarget.id)</code></li>
+</ul>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (intersects.length &gt; <span class="number">0</span>) &#123; <span class="comment">// 当前帧射线击中物体</span></span><br><span class="line">    <span class="keyword">const</span> currentTarget = intersects[<span class="number">0</span>].object;</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>._lastTarget) &#123; <span class="comment">// 上一帧射线击中物体</span></span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span>._lastTarget.id !== currentTarget.id) &#123; </span><br><span class="line">            <span class="comment">// 上一帧射线击中物体与当前帧不同，触发上一帧物体的gazeLeave事件，触发当前帧物体的gazeEnter事件</span></span><br><span class="line">            <span class="keyword">this</span>.rayList[<span class="keyword">this</span>._lastTarget.id].gazeLeave(); </span><br><span class="line">            <span class="keyword">this</span>.rayList[currentTarget.id].gazeEnter();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123; <span class="comment">// 上一帧射线未击中物体</span></span><br><span class="line">        <span class="keyword">this</span>.rayList[currentTarget.id].gazeEnter(); <span class="comment">// 上一帧射线没有击中物体，触发当前帧物体的gazeEnter事件</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">this</span>.rayList[currentTarget.id].gazeTrigger(); <span class="comment">// 当前帧射线击中物体，触发物体的gazeTrigger事件</span></span><br><span class="line">    <span class="keyword">this</span>._lastTarget = currentTarget;</span><br><span class="line">&#125; <span class="keyword">else</span> &#123; <span class="comment">// 当前帧我击中物体</span></span><br><span class="line">    <span class="keyword">if</span> ( <span class="keyword">this</span>._lastTarget ) <span class="keyword">this</span>.rayList[<span class="keyword">this</span>._lastTarget.id].gazeLeave(); <span class="comment">// 上一帧射线击中物体，触发上一帧物体gazeLeave</span></span><br><span class="line">    <span class="keyword">this</span>._lastTarget = <span class="literal">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>最后，我们需要更新<code>this._lastTarget</code>值，供下一帧进行逻辑判断，如果当前帧有物体击中，则<code>this._lastTarget = currentTarget</code>，否则执行<code>this._lastTarget = null</code>。</p>
+<h1 id="事件绑定示例"><a href="#事件绑定示例" class="headerlink" title="事件绑定示例"></a>事件绑定示例</h1><p>接下来，我们调用前面定义的<code>Gazer</code>类开发gaze交互，实现一个简单例子：随机创建100个cube立方体，当用户注视立方体时，立方体半透明。</p>
+<p>首先创建准心，设置为一个圆点作为展现给用户的光标，当然你可以创建其它准心形状，比如十字形或环形等。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建准心</span></span><br><span class="line">createCrosshair () &#123;</span><br><span class="line">    <span class="keyword">const</span> geometry = <span class="keyword">new</span> THREE.CircleGeometry( <span class="number">0.002</span>, <span class="number">16</span> );</span><br><span class="line">    <span class="keyword">const</span> material = <span class="keyword">new</span> THREE.MeshBasicMaterial(&#123;</span><br><span class="line">        color: <span class="number">0xffffff</span>,</span><br><span class="line">        opacity: <span class="number">0.5</span>,</span><br><span class="line">        transparent: <span class="literal">true</span></span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">const</span> crosshair = <span class="keyword">new</span> THREE.Mesh(geometry,material);</span><br><span class="line">    crosshair.position.z = <span class="number">-0.5</span>;</span><br><span class="line">    <span class="keyword">return</span> crosshair;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>接下来，在<code>start()</code>方法创建物体并绑定事件，在<code>update</code>监听事件。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 场景物体初始化</span></span><br><span class="line">start() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; scene, camera &#125; = <span class="keyword">this</span>;</span><br><span class="line">    ... 创建灯光、地板等</span><br><span class="line">    <span class="comment">// 添加准心到相机</span></span><br><span class="line">    camera.add(<span class="keyword">this</span>.createCrosshair());</span><br><span class="line">    <span class="keyword">this</span>.gazer = <span class="keyword">new</span> Gazer();</span><br><span class="line">    <span class="comment">// 创建立方体</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">let</span> i = <span class="number">0</span>; i &lt; <span class="number">100</span>; i++) &#123;</span><br><span class="line">        <span class="keyword">const</span> cube = <span class="keyword">this</span>.createCube(<span class="number">2</span>,<span class="number">2</span>,<span class="number">2</span> );</span><br><span class="line">        cube.position.set( <span class="number">100</span>*<span class="built_in">Math</span>.random() - <span class="number">50</span>, <span class="number">50</span>*<span class="built_in">Math</span>.random() <span class="number">-10</span>, <span class="number">100</span>*<span class="built_in">Math</span>.random() - <span class="number">50</span> );</span><br><span class="line">        scene.add(cube);</span><br><span class="line">        <span class="comment">// 绑定注视事件</span></span><br><span class="line">        <span class="keyword">this</span>.gazer.on(cube,<span class="string">'gazeEnter'</span>,() =&gt; &#123;</span><br><span class="line">            cube.material.opacity = <span class="number">0.5</span>;</span><br><span class="line">        &#125;);</span><br><span class="line">        <span class="keyword">this</span>.gazer.on(cube,<span class="string">'gazeLeave'</span>,() =&gt; &#123;</span><br><span class="line">            cube.material.opacity = <span class="number">1</span>;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 动画更新</span></span><br><span class="line">update() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; scene, camera, renderer, gazer &#125; = <span class="keyword">this</span>;</span><br><span class="line">    gazer.update(camera);</span><br><span class="line">    renderer.render(scene, camera);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在示例中，我们遵循上一期WebVRApp的代码结构，在<code>start</code>方法里增加了一个准心，为100个cube立方体绑定<code>gazeEnter</code>事件和<code>gazeLeave</code>事件，触发<code>gazeEnter</code>时，立方体半透明，触发<code>gazeLeave</code>时，立方体恢复不透明。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-246a238334c4d98d.gif?imageMogr2/auto-orient/strip" alt="gaze注视交互"></p>
+<blockquote>
+<p>演示地址：<a href="https://yonechen.github.io/WebVR-helloworld/cardboard.html" target="_blank" rel="noopener">yonechen.github.io/WebVR-helloworld/cardboard.html</a><br>源码地址：<a href="https://github.com/YoneChen/WebVR-helloworld/blob/master/cardboard.html" target="_blank" rel="noopener">github.com/YoneChen/WebVR-helloworld/blob/master/cardboard.html</a></p>
+</blockquote>
+<hr>
+<p>注视事件除了以上三种基本事件外，还衍生了像注视延迟事件和注视点击事件，这些gaze事件都可以在<code>gazeTrigger</code>里进行拓展。</p>
+<h1 id="注视点击事件"><a href="#注视点击事件" class="headerlink" title="注视点击事件"></a>注视点击事件</h1><p>cardboard二代在盒子上提供了一个按钮，当用户通过注视物体并点击按钮，由按钮点击屏幕触发。</p>
+<p>实现思路：在<code>window</code>绑定click事件，触发click时改变标志位，在<code>gazeTrigger</code>方法内根据标志位来判断是否执行回调，关键代码如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//按钮事件监听</span></span><br><span class="line"><span class="built_in">window</span>.addEventListener(<span class="string">'click'</span>, e =&gt; <span class="keyword">this</span>.state._clicked = <span class="literal">true</span>);</span><br><span class="line"><span class="keyword">this</span>.gazer.on(cube,<span class="string">'gazeTrigger'</span>,() =&gt; &#123;</span><br><span class="line">    <span class="comment">// 当用户点击时触发</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.state._clicked) &#123;</span><br><span class="line">        <span class="keyword">this</span>.state._clicked = <span class="literal">false</span>; <span class="comment">// 重置点击标志位</span></span><br><span class="line">        cube.scale.set(<span class="number">1.5</span>,<span class="number">1.5</span>,<span class="number">1.5</span>); <span class="comment">// TODO</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h1 id="注视延迟事件"><a href="#注视延迟事件" class="headerlink" title="注视延迟事件"></a>注视延迟事件</h1><p>当准心在物体上超过一定时间时触发，一般会在准心处设置一个进度条动画。<br><img src="http://upload-images.jianshu.io/upload_images/1939855-2397af1410c28ffc.gif?imageMogr2/auto-orient/strip" alt="注视延迟事件"></p>
+<p>实现思路：在<code>gazeEnter</code>时记录开始时间点，在<code>gazeTrigger</code>计算出时间差是否超过预设延迟时间，如果是则执行回调，关键代码如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//准心进入物体，开启事件触发计时</span></span><br><span class="line"><span class="keyword">this</span>.gazer.on(cube,<span class="string">'gazeEnter'</span>,() =&gt; &#123;</span><br><span class="line">    <span class="keyword">this</span>.state._wait = <span class="literal">true</span>; <span class="comment">// 计时已开始</span></span><br><span class="line">    <span class="keyword">this</span>.animate.loader.start(); <span class="comment">// 开启准心进度条动画</span></span><br><span class="line">    <span class="keyword">this</span>.state.gazeEnterTime = <span class="built_in">Date</span>.now(); <span class="comment">// 记录计时开始时间点</span></span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">this</span>.gazer.on(cube,<span class="string">'gazeTrigger'</span>,() =&gt; &#123;</span><br><span class="line">    <span class="comment">// 当计时已开始，且延迟时长超过1.5秒触发</span></span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">this</span>.state._wait &amp;&amp; <span class="built_in">Date</span>.now() - <span class="keyword">this</span>.state.gazeEnterTime &gt; <span class="number">1500</span>) &#123;</span><br><span class="line">        <span class="keyword">this</span>.animate.loader.stop(); <span class="comment">// 停止准心进度条动画</span></span><br><span class="line">        <span class="keyword">this</span>.state._wait = <span class="literal">false</span>; <span class="comment">// 计时结束</span></span><br><span class="line">        cube.material.opacity = <span class="number">0.5</span>; <span class="comment">// TODO</span></span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br><span class="line"><span class="keyword">this</span>.gazer.on(cube,<span class="string">'gazeLeave'</span>,() =&gt; &#123;</span><br><span class="line">    <span class="keyword">this</span>.animate.loader.stop(); <span class="comment">// 停止准心进度条动画</span></span><br><span class="line">    <span class="keyword">this</span>.state._wait = <span class="literal">false</span>; <span class="comment">// 计时结束</span></span><br><span class="line">    ...</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>这里准心计时进度条loader动画使用了<code>Tween.js</code>，这里就不展开了，更多可在源码地址查看。</p>
+<blockquote>
+<p>演示地址：<a href="https://yonechen.github.io/WebVR-helloworld/cardboard2.html" target="_blank" rel="noopener">yonechen.github.io/WebVR-helloworld/cardboard2.html</a></p>
+</blockquote>
+<blockquote>
+<p>源码地址：<a href="https://github.com/YoneChen/WebVR-helloworld/blob/master/cardboard2.html" target="_blank" rel="noopener">github.com/YoneChen/WebVR-helloworld/blob/master/cardboard2.html</a></p>
+</blockquote>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>以上介绍了Cardboard的gaze事件概念与原理，以及三个基本事件的开发过程，通过例子展示gaze交互实现方法，最后文末补充了gaze事件的扩展。</p>
+<p>上文提及的注视点击也是Gear VR最常用的交互方式，不过Gear VR提供了更为丰富的touchpad而不是按钮，下一期将详细介绍Gear VR与touchpad的事件开发，敬请期待。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/09/05/webvr-project/" rel="next" title="WebVR工程搭建">
+                <i class="fa fa-chevron-left"></i> WebVR工程搭建
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/12/07/webvr-learning-3/" rel="prev" title="WebVR教程--交互事件">
+                WebVR教程--交互事件 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <p class="site-author-name" itemprop="name">Yone Chen</p>
+            <p class="site-description motion-element" itemprop="description">技术空间站</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives/">
+            
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Cardboard与gaze注视"><span class="nav-number">1.</span> <span class="nav-text">Cardboard与gaze注视</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#注视事件原理"><span class="nav-number">2.</span> <span class="nav-text">注视事件原理</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#gazeEnter-gazeLeave-gazeTrigger实现"><span class="nav-number">2.1.</span> <span class="nav-text">gazeEnter, gazeLeave, gazeTrigger实现</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一步，使用构造函数constructor初始化："><span class="nav-number">2.1.1.</span> <span class="nav-text">第一步，使用构造函数constructor初始化：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二步，创建on方法提供事件绑定API"><span class="nav-number">2.1.2.</span> <span class="nav-text">第二步，创建on方法提供事件绑定API</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三步，创建update方法，在动画帧中监听三个基本事件是否触发"><span class="nav-number">2.1.3.</span> <span class="nav-text">第三步，创建update方法，在动画帧中监听三个基本事件是否触发</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#事件绑定示例"><span class="nav-number">3.</span> <span class="nav-text">事件绑定示例</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#注视点击事件"><span class="nav-number">4.</span> <span class="nav-text">注视点击事件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#注视延迟事件"><span class="nav-number">5.</span> <span class="nav-text">注视延迟事件</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">6.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yone Chen</span> |
+  <a link="https://beian.miit.gov.cn/">粤ICP备17126485号</a>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

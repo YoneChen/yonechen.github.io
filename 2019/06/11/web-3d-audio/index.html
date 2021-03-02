@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="webAudio,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="在3d开发中，除了图形视觉渲染，音频处理是重要的一环，好的音频处理可以欺骗用户的听觉，达到身临其境的效果，本文主要介绍Web3D中沉浸式音频的实现。 3D Audio3d沉浸式场景音频的输出硬件主要是耳机，根据音频源与场景之间的关系，可将3d音频分为两类：静态音频和空间化音频(audio spatialization)。 静态音频这类音频作用于整个3d场景，可简单的理解成背景音乐，音频输出是静态">
+<meta name="keywords" content="webAudio">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Web Audio实现3D音效">
+<meta property="og:url" content="https://www.yonechen.com/2019/06/11/web-3d-audio/index.html">
+<meta property="og:site_name" content="Yone Chen">
+<meta property="og:description" content="在3d开发中，除了图形视觉渲染，音频处理是重要的一环，好的音频处理可以欺骗用户的听觉，达到身临其境的效果，本文主要介绍Web3D中沉浸式音频的实现。 3D Audio3d沉浸式场景音频的输出硬件主要是耳机，根据音频源与场景之间的关系，可将3d音频分为两类：静态音频和空间化音频(audio spatialization)。 静态音频这类音频作用于整个3d场景，可简单的理解成背景音乐，音频输出是静态">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-942d158693596285.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-fd028f7d954fc1ba.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-fd8d789678835186.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-a2e551ff0d5b4bb6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-a0b7fe84246097c3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2019-06-11T03:36:21.008Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Web Audio实现3D音效">
+<meta name="twitter:description" content="在3d开发中，除了图形视觉渲染，音频处理是重要的一环，好的音频处理可以欺骗用户的听觉，达到身临其境的效果，本文主要介绍Web3D中沉浸式音频的实现。 3D Audio3d沉浸式场景音频的输出硬件主要是耳机，根据音频源与场景之间的关系，可将3d音频分为两类：静态音频和空间化音频(audio spatialization)。 静态音频这类音频作用于整个3d场景，可简单的理解成背景音乐，音频输出是静态">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1939855-942d158693596285.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.yonechen.com/2019/06/11/web-3d-audio/">
+
+
+
+
+
+  <title>Web Audio实现3D音效 | Yone Chen</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yone Chen</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cases">
+          <a href="/cases/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            cases
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.yonechen.com/2019/06/11/web-3d-audio/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yone Chen">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yone Chen">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">Web Audio实现3D音效</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-06-11T11:33:32+08:00">
+                2019-06-11
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="http://upload-images.jianshu.io/upload_images/1939855-942d158693596285.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<p>在3d开发中，除了图形视觉渲染，音频处理是重要的一环，好的音频处理可以欺骗用户的听觉，达到身临其境的效果，本文主要介绍Web3D中沉浸式音频的实现。</p>
+<h1 id="3D-Audio"><a href="#3D-Audio" class="headerlink" title="3D Audio"></a>3D Audio</h1><p>3d沉浸式场景音频的输出硬件主要是耳机，根据音频源与场景之间的关系，可将3d音频分为两类：静态音频和空间化音频(audio spatialization)。</p>
+<h2 id="静态音频"><a href="#静态音频" class="headerlink" title="静态音频"></a>静态音频</h2><p>这类音频作用于整个3d场景，可简单的理解成背景音乐，音频输出是静态的，比如微风雨滴声、闹市声等充斥整个场景的背景音效。<br>对于环境音效的开发，我们可以简单的使用<audio>标签进行循环播放。</audio></p>
+<h2 id="空间化音频"><a href="#空间化音频" class="headerlink" title="空间化音频"></a>空间化音频</h2><p>音频作用在空间的实体上，具有发声体和听者的位置关系，音频输出会根据发声体与用户的距离、方向动态变化，它模拟了现实中声音的传播方式，具有空间感。</p>
+<p>实现原理：在虚拟场景中，通过调节音频的振幅来描述发声体与听者之间的距离，再通过调节左右通道(audio channel)之间的差异，控制左右耳机喇叭输出，来描述发声体相对听者的方位。</p>
+<ul>
+<li>从发声体与用户两点间的距离来看，如距离越远，音频音量（振幅）应越小；</li>
+<li>从发声体与用户的方向来看，如发声体位于听者左侧，则音频输出的左声道应比右声道音量大。<br><img src="http://upload-images.jianshu.io/upload_images/1939855-fd028f7d954fc1ba.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="3D立体音效原理"></li>
+</ul>
+<p>形如音频空间化此类稍复杂的音频的处理，可通过Web Audio API来实现。</p>
+<h1 id="Web-Audio-API-简介"><a href="#Web-Audio-API-简介" class="headerlink" title="Web Audio API 简介"></a>Web Audio API 简介</h1><p>Web Audio API提供了一个功能强大的音频处理系统，允许我们在浏览器中通过js来实时控制处理音频，比如音频可视化、音频混合等。<br><img src="http://upload-images.jianshu.io/upload_images/1939855-fd8d789678835186.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+<p>Web Audio处理流程可以比喻成一个加工厂对声源的加工，这个加工厂由多个加工模块<code>AudioNode</code>连接而成，音频源经过一系列的处理加工后，被输送至扬声器。</p>
+<h2 id="AudioContext"><a href="#AudioContext" class="headerlink" title="AudioContext"></a>AudioContext</h2><p>类似于<code>canvas</code>的<code>context</code>上下文环境，它代表了一个audio加工厂控制中心，负责各个audioNode的创建和组合，通过<code>new AudioContext()</code>的方式创建。</p>
+<h2 id="AudioNode"><a href="#AudioNode" class="headerlink" title="AudioNode"></a>AudioNode</h2><p>AudioNode音频节点，则是加工厂的加工模块， 按照功能可分为三类：输入结点、处理结点、输出结点。每个结点都拥有<code>connect</code>方法连接下一个节点，将音频输出到下一个模块。</p>
+<ul>
+<li>输入结点主要负责加载解码音频源，比如获取二进制音频源的<code>BufferSourceNode</code>、获取<audio>音频源的<code>MediaElementSourceNode</code>等；</audio></li>
+<li>处理结点主要对音频数据进行计算处理，比如处理音频振幅的<code>GainNode</code>等；</li>
+<li>输出结点则将音频输出至扬声器或耳机，<code>AudioContext.destination</code>便是默认的输出节点。</li>
+</ul>
+<p>一个简单的音频处理流程只需要分为四步：</p>
+<ol>
+<li>创建音频上下文</li>
+<li>创建并初始化输入结点、处理结点</li>
+<li>将输入结点、处理结点、输出结点进行有连接</li>
+<li>动态修改结点属性以输出不同音效</li>
+</ol>
+<p>参考以下代码：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> myAudio = <span class="built_in">document</span>.querySelector(<span class="string">'audio'</span>);</span><br><span class="line"><span class="keyword">const</span> audioCtx = <span class="keyword">new</span> AudioContext(); <span class="comment">// 创建音频上下文</span></span><br><span class="line"> <span class="comment">// 创建输入结点，解码audio标签的音频源；创建处理结点，处理音频</span></span><br><span class="line"><span class="keyword">const</span> source = audioCtx.createMediaElementSource(myAudio);</span><br><span class="line"><span class="keyword">const</span> gainNode = audioCtx.createGain(); <span class="comment">// 创建GainNode结点控制音频振幅</span></span><br><span class="line"><span class="comment">// 将输入结点、处理结点、输出结点两两相连</span></span><br><span class="line">source.connect(gainNode); <span class="comment">// 将输入结点连接到gainNode处理结点</span></span><br><span class="line">gainNode.connect(audioCtx.destination); <span class="comment">// 将gainNode连接到destination输出节点</span></span><br><span class="line"><span class="comment">// 通过动态改变结点属性产生不同音效</span></span><br><span class="line">source.start(<span class="number">0</span>); <span class="comment">// 播放音频</span></span><br><span class="line">gainNode.gain.value = val; <span class="comment">// 设置音量</span></span><br></pre></td></tr></table></figure></p>
+<p>理解了Web Audio的开发流程，接下来看看如何在Web3d中实现Audio Spatialization，这里3d场景使用three.js进行开发。</p>
+<hr>
+<h1 id="实现空间化音频"><a href="#实现空间化音频" class="headerlink" title="实现空间化音频"></a>实现空间化音频</h1><p>Audio Spatialization的实现主要通过<code>AudioListener</code>和<code>PannerNode</code>结点配合，这两个对象可以根据空间方位信息动态处理音频源，并输出左右声道。</p>
+<ul>
+<li><code>AudioListener</code>对象代表三维空间中的听者（用户），通过<code>AudioContext.listener</code>属性获取；</li>
+<li><code>PannerNode</code>对象指的是三维空间中的发声体，通过 <code>AudioContext.createPanner()</code>创建。<br>我们需要初始化这两个对象，并将空间方位信息作为入参动态传给它们。</li>
+</ul>
+<h2 id="设置PannerNode"><a href="#设置PannerNode" class="headerlink" title="设置PannerNode"></a>设置PannerNode</h2><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> myAudio = <span class="built_in">document</span>.querySelector(<span class="string">'audio'</span>);</span><br><span class="line"><span class="keyword">const</span> audioCtx = <span class="keyword">new</span> AudioContext(); <span class="comment">// 创建音频上下文</span></span><br><span class="line"><span class="keyword">const</span> source = audioCtx.createMediaElementSource(myAudio);</span><br><span class="line"></span><br><span class="line"><span class="keyword">const</span> panner = audioCtx.createPannerNode();</span><br><span class="line">panner.setPosition(speaker.position.x, speaker.position.y, speaker.position.z); <span class="comment">// 将发声体坐标传给PannerNode</span></span><br><span class="line"></span><br><span class="line">source.connect(panner); <span class="comment">// 将输入结点连接到PannerNode处理结点</span></span><br><span class="line">panner.connect(audioCtx.destination); </span><br><span class="line">source.start(<span class="number">0</span>); <span class="comment">// 播放音频</span></span><br></pre></td></tr></table></figure>
+<h2 id="设置AudioListener"><a href="#设置AudioListener" class="headerlink" title="设置AudioListener"></a>设置AudioListener</h2><p>我们需要将这3d玩家角色的位置信息传入AudioListener，由它为我们处理音频数据。<br>对于用户位置数据，AudioListener提供了三个位置属性：<code>positionX</code>,<code>positionY</code>,<code>positionZ</code>，它分别代表听者当前位置的xyz坐标，我们可将用户在场景中的位置（一般用camera的position）赋值给这三个属性。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 为listener设置position</span></span><br><span class="line"><span class="keyword">const</span> listener = audioCtx.listener;</span><br><span class="line">listener.positionX = camera.position.x;</span><br><span class="line">listener.positionY = camera.position.y;</span><br><span class="line">listener.positionZ = camera.position.z;</span><br></pre></td></tr></table></figure>
+<p>除了传入用户的位置，我们还需要将用户的视角方向信息传给<code>AudioListener</code>，具体是给AudioListener的Forward向量三个分量<code>forwardX</code>,<code>forwardY</code>,<code>forwardZ</code>和Up向量三个分量<code>upX</code>,<code>upY</code>,<code>upZ</code>赋值。</p>
+<ul>
+<li>Forward向量沿着鼻子方向指向前，默认是(0,0,-1)；</li>
+<li>Up向量沿着头顶方向指向上，默认是(0,1,0)。<br><img src="http://upload-images.jianshu.io/upload_images/1939855-a2e551ff0d5b4bb6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Forward向量与Up向量"></li>
+<li>当用户角色改变视角时，up向量或forward向量会随之改变，但两者始终垂直。<blockquote>
+<p>Up向量 = Camera.旋转矩阵 × [0,1,0]<br>Forward向量 = Camera.旋转矩阵 × [0,0,-1]</p>
+</blockquote>
+</li>
+</ul>
+<p>参照上方公式，这里的camera是three.js的camera，指代用户的头部，通过<code>camera.quaternion</code>获取相机的旋转（四元数）矩阵，与初始向量相乘，得到当前Up向量和Forward向量，代码如下：<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 计算当前listener的forward向量</span></span><br><span class="line"><span class="keyword">let</span> forward = <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>,<span class="number">0</span>,<span class="number">-1</span>);</span><br><span class="line">forward.applyQuaternion(camera.quaternion); <span class="comment">// forward初始向量与camera四元数矩阵相乘，得到当前的forward向量</span></span><br><span class="line">forward.normalize(); <span class="comment">// 向量归一</span></span><br><span class="line"><span class="comment">// 赋值给AudioListener的forward分量</span></span><br><span class="line">listener.forwardX.value = forward.x;</span><br><span class="line">listener.forwardY.value = forward.y;</span><br><span class="line">listener.forwardZ.value = forward.z;</span><br><span class="line"><span class="comment">// 计算当前listener的up向量</span></span><br><span class="line"><span class="keyword">let</span> up = <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>);</span><br><span class="line">up.applyQuaternion(camera.quaternion); <span class="comment">// up初始向量与camera四元数矩阵相乘，得到当前的up向量</span></span><br><span class="line">up.normalize(); <span class="comment">// 向量归一</span></span><br><span class="line"><span class="comment">// 赋值给AudioListener的up分量</span></span><br><span class="line">listener.upX.value = up.x;</span><br><span class="line">listener.upY.value = up.y;</span><br><span class="line">listener.upZ.value = up.z;</span><br></pre></td></tr></table></figure></p>
+<hr>
+<h1 id="实现音频角色"><a href="#实现音频角色" class="headerlink" title="实现音频角色"></a>实现音频角色</h1><p>在3d场景中，根据音频的发起方和接收方可以分为两个角色：Speaker发声体与Listener听者，即用户。<br><img src="http://upload-images.jianshu.io/upload_images/1939855-a0b7fe84246097c3.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Listener-Speaker的一对多关系"><br>一个3d场景音频角色由一个Listener和多个Speaker组成，于是笔者将<code>PannerNode</code>和<code>AudioListener</code>进行独立封装，整合为Speaker类和Listener对象。<br><em>PS：这里沿用前几期three.js开发WebVR的方式，可参考<a href="https://zhuanlan.zhihu.com/p/25567905" target="_blank" rel="noopener">《WebVR开发——标准教程》</a></em></p>
+<h2 id="Speaker实现"><a href="#Speaker实现" class="headerlink" title="Speaker实现"></a>Speaker实现</h2><p>Speaker类代表发声体，主要做了以下事情：</p>
+<ol>
+<li>初始化阶段加载解析音频源，创建并连接输入结点、处理结点、输出结点</li>
+<li>提供<code>update</code>公用方法，在每一帧中更新PannerNode位置。<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Speaker</span> </span>&#123;</span><br><span class="line">    <span class="keyword">constructor</span>(ctx,path) &#123;</span><br><span class="line">        <span class="keyword">this</span>.path = path;</span><br><span class="line">        <span class="keyword">this</span>.ctx = ctx;</span><br><span class="line">        <span class="keyword">this</span>.source = ctx.createBufferSource();</span><br><span class="line">        <span class="keyword">this</span>.panner = ctx.createPanner();</span><br><span class="line">        <span class="keyword">this</span>.source.loop = <span class="literal">true</span>; <span class="comment">// 设置音频循环播放</span></span><br><span class="line">        <span class="keyword">this</span>.source.connect(<span class="keyword">this</span>.panner); <span class="comment">// 将输入结点连至PannerNode</span></span><br><span class="line">        <span class="keyword">this</span>.panner.connect(ctx.destination); <span class="comment">// 将PannerNode连至输出结点</span></span><br><span class="line">        <span class="keyword">this</span>._processAudio(); <span class="comment">// 异步函数，请求与加载音频数据</span></span><br><span class="line">    &#125;</span><br><span class="line">    update(position) &#123;</span><br><span class="line">        <span class="keyword">const</span> &#123; panner &#125; = <span class="keyword">this</span>;</span><br><span class="line">        panner.setPosition(position.x, position.y, position.z); <span class="comment">// 将发声体坐标传给PannerNode</span></span><br><span class="line">    &#125;</span><br><span class="line">    _loadAudio(path) &#123; </span><br><span class="line">        <span class="comment">// 使用fetch请求音频文件</span></span><br><span class="line">        <span class="keyword">return</span> fetch(path).then(<span class="function"><span class="params">res</span> =&gt;</span> res.arrayBuffer());</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">async</span> _processAudio() &#123;</span><br><span class="line">        <span class="keyword">const</span> &#123; path, ctx, source &#125; = <span class="keyword">this</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">const</span> data = <span class="keyword">await</span> <span class="keyword">this</span>._loadAudio(path); <span class="comment">// 异步请求音频</span></span><br><span class="line">            <span class="keyword">const</span> buffer = <span class="keyword">await</span> ctx.decodeAudioData(data); <span class="comment">// 解码音频数据</span></span><br><span class="line">            source.buffer = buffer; <span class="comment">// 将解码数据赋值给BufferSourceNode输入结点</span></span><br><span class="line">            source.start(<span class="number">0</span>); <span class="comment">// 播放音频</span></span><br><span class="line">        &#125; <span class="keyword">catch</span>(err) &#123;</span><br><span class="line">            <span class="built_in">console</span>.err(err);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>这里初始化的流程跟前面略有不同，这里使用的是fetch请求音频文件，通过<code>BufferSourceNode</code>输入结点解析音频数据。<br><code>update</code>方法传入发声体position，设置<code>PannerNode</code>位置。</p>
+<h2 id="Listener实现"><a href="#Listener实现" class="headerlink" title="Listener实现"></a>Listener实现</h2><p>Listener对象代表听者，提供<code>update</code>公用方法，在每帧中传入<code>AudioListener</code>的位置和方向。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 创建Listener对象</span></span><br><span class="line"><span class="keyword">const</span> Listener = &#123;</span><br><span class="line">  init(ctx) &#123;</span><br><span class="line">    <span class="keyword">this</span>.ctx = ctx;</span><br><span class="line">    <span class="keyword">this</span>.listener = <span class="keyword">this</span>.ctx.listener;</span><br><span class="line">  &#125;,</span><br><span class="line">  update(position,quaternion) &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; listener &#125; = <span class="keyword">this</span>;</span><br><span class="line">    listener.positionX = position.x;</span><br><span class="line">    listener.positionY = position.y;</span><br><span class="line">    listener.positionZ = position.z;</span><br><span class="line">    <span class="comment">// 计算当前listener的forward向量</span></span><br><span class="line">    <span class="keyword">let</span> forward = <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>,<span class="number">0</span>,<span class="number">-1</span>);</span><br><span class="line">    forward.applyQuaternion(quaternion);</span><br><span class="line">    forward.normalize();</span><br><span class="line">    listener.forwardX.value = forward.x;</span><br><span class="line">    listener.forwardY.value = forward.y;</span><br><span class="line">    listener.forwardZ.value = forward.z;</span><br><span class="line">    <span class="comment">// 计算当前listener的up向量</span></span><br><span class="line">    <span class="keyword">let</span> up = <span class="keyword">new</span> THREE.Vector3(<span class="number">0</span>,<span class="number">1</span>,<span class="number">0</span>);</span><br><span class="line">    up.applyQuaternion(quaternion);</span><br><span class="line">    up.normalize();</span><br><span class="line">    listener.upX.value = up.x;</span><br><span class="line">    listener.upY.value = up.y;</span><br><span class="line">    listener.upZ.value = up.z;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>这里只是简单的将<code>AudioListener</code>作一层封装，update方法传入camera的position和四元数矩阵，设置<code>AudioListener</code>位置、方向。</p>
+<p>接下来，将Listener和Speaker引入到WebVR应用中，下面例子描述了这样一个简陋场景：一辆狂响喇叭的汽车从你身旁经过，并驶向远方。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WebVRApp</span> </span>&#123;</span><br><span class="line">...</span><br><span class="line">  start() &#123;</span><br><span class="line">      <span class="keyword">const</span> &#123; scene, camera &#125; = <span class="keyword">this</span>;</span><br><span class="line">      ... <span class="comment">// 创建灯光、地面</span></span><br><span class="line">      <span class="comment">// 创建一辆简陋小车</span></span><br><span class="line">      <span class="keyword">const</span> geometry = <span class="keyword">new</span> THREE.CubeGeometry(<span class="number">4</span>, <span class="number">3</span>, <span class="number">5</span>);</span><br><span class="line">      <span class="keyword">const</span> material = <span class="keyword">new</span> THREE.MeshLambertMaterial(&#123; <span class="attr">color</span>: <span class="number">0xef6500</span> &#125;);</span><br><span class="line">      <span class="keyword">this</span>.car = <span class="keyword">new</span> THREE.Mesh(geometry, material)；</span><br><span class="line">      <span class="keyword">this</span>.car.position.set(<span class="number">-12</span>, <span class="number">2</span>, <span class="number">-100</span>);</span><br><span class="line">      scene.add(<span class="keyword">this</span>.car);</span><br><span class="line"></span><br><span class="line">      <span class="keyword">const</span> ctx = <span class="keyword">new</span> AudioContext(); <span class="comment">// 创建AudioContext上下文</span></span><br><span class="line">      Listener.init(ctx); <span class="comment">// 初始化listener</span></span><br><span class="line">      <span class="keyword">this</span>.car_speaker = <span class="keyword">new</span> Speaker(ctx,<span class="string">'audio/horn.wav'</span>); <span class="comment">// 创建speaker，传入上下文和音频路径</span></span><br><span class="line"></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>首先在<code>start</code>方法创建小汽车，接着初始化Listener并创建一个Speaker。<br><figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Web3dApp</span> </span>&#123;</span><br><span class="line">...</span><br><span class="line">  update() &#123;</span><br><span class="line">      <span class="keyword">const</span> &#123; scene, camera, renderer&#125; = <span class="keyword">this</span>;</span><br><span class="line">      <span class="comment">// 启动渲染</span></span><br><span class="line">      <span class="keyword">this</span>.car.position.z += <span class="number">0.4</span>;</span><br><span class="line">      <span class="keyword">this</span>.car_speaker.update(<span class="keyword">this</span>.car.position); <span class="comment">// 更新speaker位置</span></span><br><span class="line">      Listener.update(camera.position, camera.quaternion); <span class="comment">// 更新Listener位置以及头部朝向</span></span><br><span class="line">      renderer.render(scene, camera);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">new</span> Web3dApp();</span><br></pre></td></tr></table></figure></p>
+<p>在动画渲染<code>update</code>方法中，更新小汽车的位置，并调用Speaker和Listener的update方法，传入小汽车的位置、用户的位置和旋转矩阵，更新音频空间信息。<br>示例地址：<em><a href="https://yonechen.github.io/WebVR-helloworld/3d-audio.html（需要支持es7的浏览器如新版chrome，太懒没做打包编译😆）" target="_blank" rel="noopener">https://yonechen.github.io/WebVR-helloworld/3d-audio.html（需要支持es7的浏览器如新版chrome，太懒没做打包编译😆）</a></em><br>源码地址：<em><a href="https://github.com/YoneChen/WebVR-helloworld/blob/master/3d-audio.html" target="_blank" rel="noopener">https://github.com/YoneChen/WebVR-helloworld/blob/master/3d-audio.html</a></em></p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本文主要讲解了Web3d应用音频空间化的实现步骤，核心是运用了Web Audio API的<code>PannerNode</code>和<code>AudioListener</code>两个对象处理音频源，文末展示了3d Audio的一个简单代码例子，three.js本身也提供了完善的音频空间化支持，可以参考<a href="https://threejs.org/docs/api/audio/PositionalAudio.html" target="_blank" rel="noopener">PositinalAudio</a>。<br>更多文章可关注<a href="https://zhuanlan.zhihu.com/c_99472965" target="_blank" rel="noopener">WebXR技术庄园</a><br><a href="http://www.jianshu.com/p/997d354d5663" target="_blank" rel="noopener">WebVR开发教程——交互事件（二）使用Gamepad</a><br><a href="https://zhuanlan.zhihu.com/p/28324884" target="_blank" rel="noopener">WebVR开发教程——深度剖析</a> 关于WebVR的开发调试方案以及原理机制<br><a href="https://zhuanlan.zhihu.com/p/25567905" target="_blank" rel="noopener">WebVR开发教程——标准入门</a> 使用Three.js开发WebVR场景的入门教程</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/webAudio/" rel="tag"># webAudio</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/06/11/python-project/" rel="next" title="写给前端的Python依赖管理指北">
+                <i class="fa fa-chevron-left"></i> 写给前端的Python依赖管理指北
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/11/webgl-noise/" rel="prev" title="WebGL进阶——走进图形噪声">
+                WebGL进阶——走进图形噪声 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <p class="site-author-name" itemprop="name">Yone Chen</p>
+            <p class="site-description motion-element" itemprop="description">技术空间站</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives/">
+            
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#3D-Audio"><span class="nav-number">1.</span> <span class="nav-text">3D Audio</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#静态音频"><span class="nav-number">1.1.</span> <span class="nav-text">静态音频</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#空间化音频"><span class="nav-number">1.2.</span> <span class="nav-text">空间化音频</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Web-Audio-API-简介"><span class="nav-number">2.</span> <span class="nav-text">Web Audio API 简介</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#AudioContext"><span class="nav-number">2.1.</span> <span class="nav-text">AudioContext</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#AudioNode"><span class="nav-number">2.2.</span> <span class="nav-text">AudioNode</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现空间化音频"><span class="nav-number">3.</span> <span class="nav-text">实现空间化音频</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#设置PannerNode"><span class="nav-number">3.1.</span> <span class="nav-text">设置PannerNode</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#设置AudioListener"><span class="nav-number">3.2.</span> <span class="nav-text">设置AudioListener</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#实现音频角色"><span class="nav-number">4.</span> <span class="nav-text">实现音频角色</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Speaker实现"><span class="nav-number">4.1.</span> <span class="nav-text">Speaker实现</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Listener实现"><span class="nav-number">4.2.</span> <span class="nav-text">Listener实现</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">5.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yone Chen</span> |
+  <a link="https://beian.miit.gov.cn/">粤ICP备17126485号</a>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

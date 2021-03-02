@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.2" rel="stylesheet" type="text/css">
+
+
+  <meta name="keywords" content="webvr,">
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.2">
+
+
+
+
+
+
+<meta name="description" content="上期从头显和手柄两个层面对VR交互事件进行介绍，前者使用的是WebVR API，而后者则需用到Gamepad API，本期将对Gamepad API展开介绍。 Gamepad APIGamepad API是一个HTML5接口，让开发者可以通过js访问游戏手柄，使用Gamepad API的第一步是获取gamepad实例。 一个典型的gamepad一般都会有button按钮和axes control控">
+<meta name="keywords" content="webvr">
+<meta property="og:type" content="article">
+<meta property="og:title" content="WebVR教程--使用Gamepad API">
+<meta property="og:url" content="https://www.yonechen.com/2017/12/07/webvr-learning-4/index.html">
+<meta property="og:site_name" content="Yone Chen">
+<meta property="og:description" content="上期从头显和手柄两个层面对VR交互事件进行介绍，前者使用的是WebVR API，而后者则需用到Gamepad API，本期将对Gamepad API展开介绍。 Gamepad APIGamepad API是一个HTML5接口，让开发者可以通过js访问游戏手柄，使用Gamepad API的第一步是获取gamepad实例。 一个典型的gamepad一般都会有button按钮和axes control控">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-1415edc4196b3b78.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-90d97f5d82caca44.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-0cf70a16032bd59f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-b8f29a547f87437a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-4eb9478baa631a81.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/1939855-d0d5d151355bc732.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2017-12-07T09:18:44.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="WebVR教程--使用Gamepad API">
+<meta name="twitter:description" content="上期从头显和手柄两个层面对VR交互事件进行介绍，前者使用的是WebVR API，而后者则需用到Gamepad API，本期将对Gamepad API展开介绍。 Gamepad APIGamepad API是一个HTML5接口，让开发者可以通过js访问游戏手柄，使用Gamepad API的第一步是获取gamepad实例。 一个典型的gamepad一般都会有button按钮和axes control控">
+<meta name="twitter:image" content="http://upload-images.jianshu.io/upload_images/1939855-1415edc4196b3b78.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '5.1.2',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="https://www.yonechen.com/2017/12/07/webvr-learning-4/">
+
+
+
+
+
+  <title>WebVR教程--使用Gamepad API | Yone Chen</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Yone Chen</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-about">
+          <a href="/about/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-user"></i> <br>
+            
+            关于
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-cases">
+          <a href="/cases/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-calendar"></i> <br>
+            
+            cases
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://www.yonechen.com/2017/12/07/webvr-learning-4/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Yone Chen">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Yone Chen">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">WebVR教程--使用Gamepad API</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-12-07T14:26:40+08:00">
+                2017-12-07
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="http://upload-images.jianshu.io/upload_images/1939855-1415edc4196b3b78.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="VR手柄模拟射箭"><br>上期从头显和手柄两个层面对VR交互事件进行介绍，前者使用的是WebVR API，而后者则需用到Gamepad API，本期将对Gamepad API展开介绍。</p>
+<h1 id="Gamepad-API"><a href="#Gamepad-API" class="headerlink" title="Gamepad API"></a>Gamepad API</h1><p>Gamepad API是一个HTML5接口，让开发者可以通过js访问游戏手柄，使用Gamepad API的第一步是获取gamepad实例。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-90d97f5d82caca44.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="典型的Gamepad构造"><br>一个典型的gamepad一般都会有button按钮和axes control控制单元，而VR gamepad则是在前两者的基础上，加上对传感器的支持。</p>
+<h2 id="Gamepad"><a href="#Gamepad" class="headerlink" title="Gamepad"></a>Gamepad</h2><table>
+<thead>
+<tr>
+<th style="text-align:center">属性</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">id</td>
+<td style="text-align:center">string类型，包含手柄的标识信息。</td>
+</tr>
+<tr>
+<td style="text-align:center">connected</td>
+<td style="text-align:center">bool类型，反映手柄是否处于连接状态</td>
+</tr>
+<tr>
+<td style="text-align:center">buttons</td>
+<td style="text-align:center">返回<code>GampadButton</code>对象数组，即手柄上的所有可用按钮</td>
+</tr>
+<tr>
+<td style="text-align:center">axes</td>
+<td style="text-align:center">返回double类型数组，数组元素为手柄控制元件上各轴向数值</td>
+</tr>
+<tr>
+<td style="text-align:center">pose</td>
+<td style="text-align:center">返回一个<code>GamepadPose</code>对象，包含手柄的方向和位置信息</td>
+</tr>
+</tbody>
+</table>
+<p>获取headset实例需要调用<code>navigator.getVRDisplays()</code>方法，同样，获取一个手柄的实例，则是调用<code>navigator.getGamepads()</code>方法，它返回一个<code>gamepads</code>数组。<br>一旦有手柄连接上，<code>gamepads</code>数组将产生有效的gamepad对象，否则，只能是null。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">function</span> <span class="title">getGamepad</span>(<span class="params">id</span>)</span></span><br><span class="line"><span class="function">  <span class="title">const</span> <span class="title">gamepads</span> = <span class="title">navigator</span>.<span class="title">getGamepads</span>(<span class="params"></span>);</span></span><br><span class="line"><span class="function">  <span class="title">for</span> (<span class="params">let i = <span class="number">0</span>; i &lt; gamepads.length; ++i</span>) </span>&#123;</span><br><span class="line">    <span class="keyword">let</span> gamepad = gamepads[i];</span><br><span class="line">    <span class="comment">// 只有gamepad不为null才有效</span></span><br><span class="line">    <span class="keyword">if</span> (gamepad &amp;&amp; gamepad.id === id)  <span class="keyword">return</span> gamepad;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// 或者写成这样： let getGamepad = id =&gt; navigator.getGamepads().filter( gamepad =&gt; gamepad &amp;&amp; gamepad.id === id )[0];</span></span><br><span class="line"><span class="keyword">this</span>.gamepad = getGamepad(<span class="string">'daydream vr controller'</span>); <span class="comment">// 获取daydream controller手柄</span></span><br></pre></td></tr></table></figure>
+<p>上面实现的是根据手柄id获取单个gamepad实例的方法，有些VR手柄如Vive Controller, Oculus Touch等是双手柄，则需要获取两个gamepad实例。</p>
+<p>接下来，我将针对gamepad实例的<code>buttons</code>, <code>axes</code>, <code>pose</code>三个重要属性进行介绍，它们对应的是手柄按钮、控制元件、传感器三类组件，是实现gamepad交互事件的三大法宝。</p>
+<h3 id="Gamepad-buttons"><a href="#Gamepad-buttons" class="headerlink" title="Gamepad.buttons"></a>Gamepad.buttons</h3><p><code>Gamepad.buttons</code>作为<code>gamepad</code>实例的一个重要属性，代表手柄或遥控器上的所有可用按钮，返回的是由一个或多个<code>GamepadButton</code>对象组成的数组。</p>
+<p><code>GamepadButton</code>顾名思义指的是gamepad上的按钮实例，我们可以该实例获取按钮的状态，比如是否被点击。<br><img src="http://upload-images.jianshu.io/upload_images/1939855-0cf70a16032bd59f.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Gamepad Buttons"></p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">属性</th>
+<th style="text-align:center">类型</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">id</td>
+<td style="text-align:center">string类型</td>
+<td style="text-align:center">按钮的id名</td>
+</tr>
+<tr>
+<td style="text-align:center">pressed</td>
+<td style="text-align:center">bool类型</td>
+<td style="text-align:center">按钮是否处于按压状态。</td>
+</tr>
+<tr>
+<td style="text-align:center">touched</td>
+<td style="text-align:center">bool类型</td>
+<td style="text-align:center">按钮是否处于触摸状态。</td>
+</tr>
+<tr>
+<td style="text-align:center">value</td>
+<td style="text-align:center">double类型</td>
+<td style="text-align:center">反映按钮被按压的程度</td>
+</tr>
+</tbody>
+</table>
+<p>由于gamepad的构造都不尽相同，如果想识别<code>Gamepad.buttons</code>中确认键或者返回键对象，可以通过<code>GamepadButton.id</code>的值来判断。<br>下面是利用<code>pressed</code>实现tap事件的代码，这里定义的tap事件，是指手指按下按钮瞬间产生的触发事件，不按压或持续按压过程不会产生tap。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">update() &#123;</span><br><span class="line">  <span class="keyword">const</span> button = <span class="keyword">this</span>.gamepad.buttons[<span class="number">0</span>]; <span class="comment">// 确认键对象通常位于数组第一个</span></span><br><span class="line">  <span class="keyword">if</span> (!<span class="keyword">this</span>._lastPressed &amp;&amp; button.pressed) &#123;</span><br><span class="line">    <span class="comment">// 处理tap事件</span></span><br><span class="line">  &#125;</span><br><span class="line">  <span class="keyword">this</span>._lastPressed = button.pressed;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>用代码的语言来说，就是只有满足：1) 上一帧的<code>button.pressed</code>为<code>false</code>； 2) 当前帧的<code>button.pressed</code>为<code>true</code>的才会触发tap事件。<br>于是，我们需要定义一个<code>_lastPressed</code>来记录上一帧button是否pressed。<br>使用<code>gamepad.buttons</code>可以轻松实现gamepad按钮的点击事件，接下来，将介绍另一个重要属性<code>gampad.axes</code>，通过它我们可以判断触控板手势、摇杆朝向等。</p>
+<h3 id="Gamepad-axes"><a href="#Gamepad-axes" class="headerlink" title="Gamepad.axes"></a>Gamepad.axes</h3><p><code>Gamepad.axes</code>返回的是gamepad控制元件的轴数据集，如手柄上的手摇杆<code>Thumbstick</code>、遥控器上的触控板<code>Touchpad</code>都是具有双轴向的元件。<br>当用户用手指推进摇杆或者轻触触控板时，都可以用一个二维笛卡尔坐标<code>[x,y]</code>来表示当前摇杆或触控板被触发的方位，如下图，返回一个-1.0~1.0的double数值组，一般将按水平、竖直的顺序排序，如axes[0]表示x轴位置、axes[1]表示y轴位置。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-b8f29a547f87437a.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Gamepad Axes"></p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">update() &#123;</span><br><span class="line">  <span class="keyword">const</span> axes = <span class="keyword">this</span>.gamepad.axes; <span class="comment">// 获取轴向数组</span></span><br><span class="line">  <span class="keyword">const</span> x = axes[<span class="number">0</span>], y = axes[<span class="number">1</span>], </span><br><span class="line">  dx = x - <span class="keyword">this</span>._lastAxes[<span class="number">0</span>], dy = y - <span class="keyword">this</span>._lastAxes[<span class="number">1</span>];</span><br><span class="line">  <span class="comment">// 控制画廊位移</span></span><br><span class="line">  gallery.position.x += dx;</span><br><span class="line">  gallery.position.y += dy;</span><br><span class="line">  <span class="keyword">this</span>._lastAxes = axes; </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面通过计算两帧之间摇杆在x轴和y轴的位移，控制画廊的显示位置，当摇杆向左推时，画廊也向左移动。</p>
+<h3 id="GamepadPose"><a href="#GamepadPose" class="headerlink" title="GamepadPose"></a>GamepadPose</h3><p><code>gamepad.pose</code>属性返回的<code>GamepadPose</code>对象，与头显的<code>VRPose</code>对象类似，<code>GamepadPose</code>访问的是VR手柄的传感器（加速计和陀螺仪），可以直接获取gamepad的方向、位置、速度和加速度等信息。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:center">属性</th>
+<th style="text-align:center">类型</th>
+<th style="text-align:center">说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">hasPosition</td>
+<td style="text-align:center">bool</td>
+<td style="text-align:center">gamepad是否具有position属性。</td>
+</tr>
+<tr>
+<td style="text-align:center">hasOrientation</td>
+<td style="text-align:center">bool</td>
+<td style="text-align:center">gamepad是否具有orientation属性。</td>
+</tr>
+<tr>
+<td style="text-align:center">position</td>
+<td style="text-align:center"><a href="https://developer.mozilla.org/en-US/docs/Web/API/Float32Array" target="_blank" rel="noopener">Float32Array</a></td>
+<td style="text-align:center">返回gamepad的位置矩阵</td>
+</tr>
+<tr>
+<td style="text-align:center">orientation</td>
+<td style="text-align:center">Float32Array</td>
+<td style="text-align:center">返回gamepad的方向矩阵</td>
+</tr>
+<tr>
+<td style="text-align:center">angularAcceleration</td>
+<td style="text-align:center">Float32Array</td>
+<td style="text-align:center">返回x, y, z轴每秒的角加速度</td>
+</tr>
+<tr>
+<td style="text-align:center">angularVelocity</td>
+<td style="text-align:center">Float32Array</td>
+<td style="text-align:center">返回x, y, z轴每秒的角速度</td>
+</tr>
+<tr>
+<td style="text-align:center">linearAcceleration</td>
+<td style="text-align:center">Float32Array</td>
+<td style="text-align:center">返回x, y, z轴每秒的线性加速度</td>
+</tr>
+<tr>
+<td style="text-align:center">linearVelocity</td>
+<td style="text-align:center">Float32Array</td>
+<td style="text-align:center">返回x, y, z轴的线性速度</td>
+</tr>
+</tbody>
+</table>
+<h4 id="hasPosition与hasOrientation"><a href="#hasPosition与hasOrientation" class="headerlink" title="hasPosition与hasOrientation"></a>hasPosition与hasOrientation</h4><p>只有3-DoF的gamepad如Gear VR和Daydream的Controller只包含<code>orientation</code>方向矩阵，因此<code>hasOrientation</code>为<code>true</code>而<code>hasPosition</code>为<code>false</code>；<br>而6-DoF的gamepad如Oculus touch和HTC Vive Controller由于<code>orientation</code>和<code>position</code>兼具，因此<code>hasOrientation</code>和<code>hasPosition</code>都为<code>true</code>。</p>
+<h4 id="position与orientation"><a href="#position与orientation" class="headerlink" title="position与orientation"></a>position与orientation</h4><p>GamepadPose最重要的属性，通过这两个属性可以将现实的手柄映射到VR三维世界中，比如当用户使用手柄玩射击游戏时，就需要获取每一帧gamepad的oritentation，并赋值给3d场景里的枪支模型。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">update() &#123;</span><br><span class="line">    <span class="keyword">const</span> &#123; orientation, position &#125; = <span class="keyword">this</span>.gamepad.pose;</span><br><span class="line">    controller.quaternion.fromArray( orientation ); <span class="comment">// 将方向矩阵赋值给遥控器模型</span></span><br><span class="line">    controller.position.fromArray( position ); <span class="comment">// 将位置矩阵赋值给遥控器模型</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-4eb9478baa631a81.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="Drop Dead 手枪射杀丧尸"></p>
+<h4 id="Acceleration与Velocity"><a href="#Acceleration与Velocity" class="headerlink" title="Acceleration与Velocity"></a>Acceleration与Velocity</h4><p>GamepadPose还提供了一系列运动属性：角加速度、角速度、线性速度、线性加速度，我们可以根据这些属性进行更丰富的物理行为，比如使用加速度×质量来计算物体受力情况，适用于诸如砍杀、击球等复杂运动形式，这里就不展开细说了。</p>
+<hr>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>至此，WebVR事件开发基础已经讲完，接下来，我将对各主流VR类型进行针对性实现，根据交互的复杂性，将按照Cardboard→Gear VR→Daydream→Oculus Rift 由屌丝到高富帅的路线。</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/1939855-d0d5d151355bc732.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/webvr/" rel="tag"># webvr</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/12/07/webvr-learning-3/" rel="next" title="WebVR教程--交互事件">
+                <i class="fa fa-chevron-left"></i> WebVR教程--交互事件
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/06/11/python-project/" rel="prev" title="写给前端的Python依赖管理指北">
+                写给前端的Python依赖管理指北 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          
+            <p class="site-author-name" itemprop="name">Yone Chen</p>
+            <p class="site-description motion-element" itemprop="description">技术空间站</p>
+        </div>
+
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+            
+              <a href="/archives/">
+            
+                <span class="site-state-item-count">9</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">5</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Gamepad-API"><span class="nav-number">1.</span> <span class="nav-text">Gamepad API</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Gamepad"><span class="nav-number">1.1.</span> <span class="nav-text">Gamepad</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Gamepad-buttons"><span class="nav-number">1.1.1.</span> <span class="nav-text">Gamepad.buttons</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Gamepad-axes"><span class="nav-number">1.1.2.</span> <span class="nav-text">Gamepad.axes</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GamepadPose"><span class="nav-number">1.1.3.</span> <span class="nav-text">GamepadPose</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#hasPosition与hasOrientation"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">hasPosition与hasOrientation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#position与orientation"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">position与orientation</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Acceleration与Velocity"><span class="nav-number">1.1.3.3.</span> <span class="nav-text">Acceleration与Velocity</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#小结"><span class="nav-number">2.</span> <span class="nav-text">小结</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Yone Chen</span> |
+  <a link="https://beian.miit.gov.cn/">粤ICP备17126485号</a>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">NexT.Pisces</a> v5.1.2</div>
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.2"></script>
+
+
+
+  
+  
+
+
+  <script type="text/javascript" src="/js/src/affix.js?v=5.1.2"></script>
+
+  <script type="text/javascript" src="/js/src/schemes/pisces.js?v=5.1.2"></script>
+
+
+
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.2"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.2"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
